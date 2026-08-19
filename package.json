@@ -1,0 +1,51 @@
+{
+  "name": "@okpaid-io/sdk",
+  "version": "0.1.0",
+  "description": "Typed TypeScript client for the OKPaid POS API (https://api.okpaid.io). Generated from the published OpenAPI 3.0.0 spec.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OKPaid-io/okpaid-sdk.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "generate": "openapi-typescript spec/openapi.json -o src/generated/api.ts",
+    "generate:remote": "curl -fsSL https://help.okpaid.io/openapi/openapi.json -o spec/openapi.json && openapi-typescript spec/openapi.json -o src/generated/api.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "type-check": "tsc --noEmit",
+    "test": "bun test",
+    "lint:check": "biome check .",
+    "format": "biome check --write .",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.14",
+    "@types/bun": "^1.3.0",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@11.0.8"
+}
