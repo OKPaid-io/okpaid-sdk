@@ -1,0 +1,86 @@
+name: Bug report
+description: Something in the SDK is broken, wrong, or behaves unexpectedly
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Fill in as much as you can; a minimal reproduction speeds things up a lot.
+  - type: input
+    id: version
+    attributes:
+      label: SDK version
+      description: Version from package.json / npm output (e.g. 0.1.0). "latest" is not a version.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Where does the SDK run?
+      options:
+        - Node.js
+        - Browser
+        - Cloudflare Workers
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: auth-mode
+    attributes:
+      label: Auth mode
+      options:
+        - API key (apiKey)
+        - 'Session cookie (credentials: "include")'
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: endpoint
+    attributes:
+      label: Affected endpoint(s)
+      description: Path(s) such as /api/v1/organizations/{orgId}/customers
+      placeholder: /api/v1/...
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Actual behavior, including the exact error message or type error.
+      placeholder: |
+        Got a TypeError / wrong response shape / compile error:
+        ```
+        paste the error here
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal code snippet that triggers the issue. Strip secrets; use placeholder API keys.
+      render: typescript
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else relevant (SDK build method, bundler, generated types vs live API, etc.)
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
+        - label: I am on the latest published SDK version
+          required: false

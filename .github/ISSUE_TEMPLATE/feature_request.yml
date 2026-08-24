@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest an improvement or new capability for the SDK
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way? Focus on the need, not your proposed solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How the SDK could address it (API shape, config option, helper, etc.). Code sketches welcome.
+      render: typescript
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you tried or other designs you considered, and why they fall short.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Where does the change live?
+      options:
+        - SDK code (client behavior, options, helpers)
+        - Generated types (endpoint paths, params, response shapes)
+        - Runtime support (Node/browser/Workers compatibility)
+        - Documentation
+        - Other / not sure
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this is not a duplicate
+          required: true
