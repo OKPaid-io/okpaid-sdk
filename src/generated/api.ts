@@ -454,6 +454,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{orgId}/sync/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply outbox operations (offline sync push)
+         * @description Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' only; each op is applied in its own transaction with the same guards as POST /:orgId/sales, and a replayed sale id is a no-op reported as 'duplicate'.
+         */
+        post: operations["post_api_v1_organizations__orgId__sync_push"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/sync/pull": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pull incremental catalog + sales (offline sync)
+         * @description Returns products (with stock) and recent sales for the org, optionally filtered to rows updated/created after `since` (ISO datetime). v1 serves full lists when `since` is omitted — fine for single-store orgs with hundreds of SKUs.
+         */
+        get: operations["get_api_v1_organizations__orgId__sync_pull"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{orgId}/products/lookup": {
         parameters: {
             query?: never;
@@ -1560,6 +1600,7 @@ export interface operations {
                                 name?: string;
                                 displayName: string;
                                 priceMonthly?: number;
+                                priceYearly?: number | null;
                                 maxUsers: number;
                                 maxInvoicesPerMonth: number | null;
                                 maxApiCallsPerMonth: number | null;
@@ -3279,6 +3320,8 @@ export interface operations {
             content: {
                 "application/json": {
                     receiptNumber: string;
+                    /** Format: uuid */
+                    id?: string;
                     subtotal: string;
                     taxAmount?: string;
                     discountAmount?: string;
@@ -4121,6 +4164,183 @@ export interface operations {
                                 transactionCount: number;
                             }[];
                         }[];
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__sync_push: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    ops: {
+                        idempotency_key: string;
+                        op_type: string;
+                        payload: {
+                            receiptNumber: string;
+                            /** Format: uuid */
+                            id?: string;
+                            subtotal: string;
+                            taxAmount?: string;
+                            discountAmount?: string;
+                            cartDiscountAmount?: string;
+                            promoCodeId?: string;
+                            total: string;
+                            paymentMethod: string;
+                            /** @enum {string} */
+                            paymentStatus?: "pending" | "completed" | "pending_refund" | "refunded";
+                            cashReceived?: string;
+                            notes?: string;
+                            customerName?: string;
+                            customerPhone?: string;
+                            items: {
+                                productId?: string;
+                                productName: string;
+                                productBarcode?: string;
+                                quantity: number;
+                                unitPrice: string;
+                                discount?: string;
+                            }[];
+                        };
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Per-op results */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        results: {
+                            idempotency_key: string;
+                            /** @enum {string} */
+                            status: "applied" | "duplicate" | "rejected";
+                            sale_id?: string;
+                            error?: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    get_api_v1_organizations__orgId__sync_pull: {
+        parameters: {
+            query?: {
+                since?: string;
+            };
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products + sales since the cursor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            id: string;
+                            name: string;
+                            barcode: string | null;
+                            sellingPrice: string;
+                            stockQuantity: number;
+                            updatedAt: string;
+                        }[];
+                        sales: {
+                            id: string;
+                            receiptNumber: string;
+                            total: string;
+                            paymentMethod: string;
+                            paymentStatus: string;
+                            createdAt: string;
+                        }[];
+                        serverTime: string;
                     };
                 };
             };
@@ -11138,6 +11358,7 @@ export interface operations {
                             name: string;
                             displayName: string;
                             priceMonthly: number;
+                            priceYearly: number | null;
                             maxUsers: number;
                             maxInvoicesPerMonth: number | null;
                             maxApiCallsPerMonth: number | null;
@@ -11185,6 +11406,7 @@ export interface operations {
                             name: string;
                             displayName: string;
                             priceMonthly: number;
+                            priceYearly: number | null;
                             maxUsers: number;
                             maxInvoicesPerMonth: number | null;
                             maxApiCallsPerMonth: number | null;
@@ -11266,6 +11488,7 @@ export interface operations {
                                 name: string;
                                 displayName: string;
                                 priceMonthly: number;
+                                priceYearly: number | null;
                                 maxUsers: number;
                                 maxInvoicesPerMonth: number | null;
                                 maxApiCallsPerMonth: number | null;
@@ -11369,6 +11592,7 @@ export interface operations {
                                 name: string;
                                 displayName: string;
                                 priceMonthly: number;
+                                priceYearly: number | null;
                                 maxUsers: number;
                                 maxInvoicesPerMonth: number | null;
                                 maxApiCallsPerMonth: number | null;
