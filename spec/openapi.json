@@ -67,6 +67,10 @@
                             "priceMonthly": {
                               "type": "number"
                             },
+                            "priceYearly": {
+                              "type": "number",
+                              "nullable": true
+                            },
                             "maxUsers": {
                               "type": "number"
                             },
@@ -3837,6 +3841,11 @@
                     "type": "string",
                     "minLength": 1
                   },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
                   "subtotal": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
@@ -5855,6 +5864,399 @@
           }
         },
         "operationId": "get_api_v1_organizations__orgId__analytics_employee_timeseries"
+      }
+    },
+    "/api/v1/organizations/{orgId}/sync/push": {
+      "post": {
+        "tags": ["Sync"],
+        "summary": "Apply outbox operations (offline sync push)",
+        "description": "Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' only; each op is applied in its own transaction with the same guards as POST /:orgId/sales, and a replayed sale id is a no-op reported as 'duplicate'.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ops": {
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idempotency_key": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 255
+                        },
+                        "op_type": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "payload": {
+                          "type": "object",
+                          "properties": {
+                            "receiptNumber": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "subtotal": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "taxAmount": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "discountAmount": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "cartDiscountAmount": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "promoCodeId": {
+                              "type": "string"
+                            },
+                            "total": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "paymentMethod": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "paymentStatus": {
+                              "type": "string",
+                              "enum": ["pending", "completed", "pending_refund", "refunded"]
+                            },
+                            "cashReceived": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "notes": {
+                              "type": "string"
+                            },
+                            "customerName": {
+                              "type": "string"
+                            },
+                            "customerPhone": {
+                              "type": "string"
+                            },
+                            "items": {
+                              "minItems": 1,
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "productId": {
+                                    "type": "string"
+                                  },
+                                  "productName": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "productBarcode": {
+                                    "type": "string"
+                                  },
+                                  "quantity": {
+                                    "type": "integer",
+                                    "exclusiveMinimum": true,
+                                    "maximum": 9007199254740991,
+                                    "minimum": 0
+                                  },
+                                  "unitPrice": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                  },
+                                  "discount": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                  }
+                                },
+                                "required": ["productName", "quantity", "unitPrice"]
+                              }
+                            }
+                          },
+                          "required": ["receiptNumber", "subtotal", "total", "paymentMethod", "items"]
+                        }
+                      },
+                      "required": ["idempotency_key", "op_type", "payload"]
+                    }
+                  }
+                },
+                "required": ["ops"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Per-op results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "idempotency_key": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["applied", "duplicate", "rejected"]
+                          },
+                          "sale_id": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["idempotency_key", "status"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["results"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post_api_v1_organizations__orgId__sync_push"
+      }
+    },
+    "/api/v1/organizations/{orgId}/sync/pull": {
+      "get": {
+        "tags": ["Sync"],
+        "summary": "Pull incremental catalog + sales (offline sync)",
+        "description": "Returns products (with stock) and recent sales for the org, optionally filtered to rows updated/created after `since` (ISO datetime). v1 serves full lists when `since` is omitted — fine for single-store orgs with hundreds of SKUs.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "since",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+            }
+          },
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products + sales since the cursor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "products": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "barcode": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "sellingPrice": {
+                            "type": "string"
+                          },
+                          "stockQuantity": {
+                            "type": "number"
+                          },
+                          "updatedAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["id", "name", "barcode", "sellingPrice", "stockQuantity", "updatedAt"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "sales": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "receiptNumber": {
+                            "type": "string"
+                          },
+                          "total": {
+                            "type": "string"
+                          },
+                          "paymentMethod": {
+                            "type": "string"
+                          },
+                          "paymentStatus": {
+                            "type": "string"
+                          },
+                          "createdAt": {
+                            "type": "string"
+                          }
+                        },
+                        "required": ["id", "receiptNumber", "total", "paymentMethod", "paymentStatus", "createdAt"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "serverTime": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["products", "sales", "serverTime"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_api_v1_organizations__orgId__sync_pull"
       }
     },
     "/api/v1/organizations/{orgId}/products/lookup": {
@@ -19723,6 +20125,10 @@
                           "priceMonthly": {
                             "type": "number"
                           },
+                          "priceYearly": {
+                            "type": "number",
+                            "nullable": true
+                          },
                           "maxUsers": {
                             "type": "number"
                           },
@@ -19752,6 +20158,7 @@
                           "name",
                           "displayName",
                           "priceMonthly",
+                          "priceYearly",
                           "maxUsers",
                           "maxInvoicesPerMonth",
                           "maxApiCallsPerMonth",
@@ -19829,6 +20236,10 @@
                         "priceMonthly": {
                           "type": "number"
                         },
+                        "priceYearly": {
+                          "type": "number",
+                          "nullable": true
+                        },
                         "maxUsers": {
                           "type": "number"
                         },
@@ -19858,6 +20269,7 @@
                         "name",
                         "displayName",
                         "priceMonthly",
+                        "priceYearly",
                         "maxUsers",
                         "maxInvoicesPerMonth",
                         "maxApiCallsPerMonth",
@@ -20002,6 +20414,10 @@
                             "priceMonthly": {
                               "type": "number"
                             },
+                            "priceYearly": {
+                              "type": "number",
+                              "nullable": true
+                            },
                             "maxUsers": {
                               "type": "number"
                             },
@@ -20022,6 +20438,7 @@
                             "name",
                             "displayName",
                             "priceMonthly",
+                            "priceYearly",
                             "maxUsers",
                             "maxInvoicesPerMonth",
                             "maxApiCallsPerMonth",
@@ -20212,6 +20629,10 @@
                             "priceMonthly": {
                               "type": "number"
                             },
+                            "priceYearly": {
+                              "type": "number",
+                              "nullable": true
+                            },
                             "maxUsers": {
                               "type": "number"
                             },
@@ -20229,6 +20650,7 @@
                             "name",
                             "displayName",
                             "priceMonthly",
+                            "priceYearly",
                             "maxUsers",
                             "maxInvoicesPerMonth",
                             "maxApiCallsPerMonth"
