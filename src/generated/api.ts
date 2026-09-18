@@ -2031,6 +2031,11 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
@@ -2103,6 +2108,11 @@ export interface operations {
                     currency?: string | null;
                     timezone?: string | null;
                     dateFormat?: string | null;
+                    dualCurrencyEnabled?: boolean | null;
+                    exchangeRate?: string | null;
+                    /** @enum {string|null} */
+                    receiptCurrencyMode?: "dual" | "primary" | "secondary" | null;
+                    secondaryCurrency?: string | null;
                     barcodeFieldsConfig?: {
                         enabledFields: ("quantity" | "nutritionGrade" | "novaGroup" | "nutriments" | "allergens" | "ingredientsText" | "labels" | "origins" | "manufacturingPlaces" | "servingSize" | "packagingTags" | "categoriesTags")[];
                         showInProductForm: boolean;
@@ -2139,6 +2149,11 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
@@ -2204,6 +2219,8 @@ export interface operations {
                     currency: string;
                     timezone: string;
                     country: string;
+                    dualCurrencyEnabled: boolean;
+                    exchangeRate: string | null;
                 };
             };
         };
@@ -2235,6 +2252,11 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
@@ -3326,12 +3348,16 @@ export interface operations {
                     taxAmount?: string;
                     discountAmount?: string;
                     cartDiscountAmount?: string;
+                    promoDiscountAmount?: string;
                     promoCodeId?: string;
                     total: string;
                     paymentMethod: string;
                     /** @enum {string} */
                     paymentStatus?: "pending" | "completed" | "pending_refund" | "refunded";
                     cashReceived?: string;
+                    cashReceivedPrimary?: string;
+                    cashReceivedSecondary?: string;
+                    changeGivenSecondary?: string;
                     notes?: string;
                     customerName?: string;
                     customerPhone?: string;
@@ -3405,19 +3431,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
-                    };
-                };
-            };
-            /** @description 429 Too Many Requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                        currentCount: number;
-                        maxCount: number | null;
                     };
                 };
             };
@@ -3630,8 +3643,12 @@ export interface operations {
                             organizationId: string;
                             userId: string | null;
                             cartDiscountAmount: string;
+                            promoDiscountAmount: string;
                             promoCodeId: string | null;
                             shiftId: string | null;
+                            cashReceivedPrimary: string | null;
+                            cashReceivedSecondary: string | null;
+                            changeGivenSecondary: string | null;
                             holdStatus: string | null;
                             holdExpiresAt: string | null;
                             notes: string | null;
@@ -3715,6 +3732,9 @@ export interface operations {
                     /** @enum {string} */
                     paymentStatus: "pending" | "completed" | "pending_refund" | "refunded";
                     cashReceived?: string;
+                    cashReceivedPrimary?: string;
+                    cashReceivedSecondary?: string;
+                    changeGivenSecondary?: string;
                 };
             };
         };
@@ -3743,8 +3763,12 @@ export interface operations {
                             organizationId: string;
                             userId: string | null;
                             cartDiscountAmount: string;
+                            promoDiscountAmount: string;
                             promoCodeId: string | null;
                             shiftId: string | null;
+                            cashReceivedPrimary: string | null;
+                            cashReceivedSecondary: string | null;
+                            changeGivenSecondary: string | null;
                             holdStatus: string | null;
                             holdExpiresAt: string | null;
                             notes: string | null;
@@ -4227,12 +4251,16 @@ export interface operations {
                             taxAmount?: string;
                             discountAmount?: string;
                             cartDiscountAmount?: string;
+                            promoDiscountAmount?: string;
                             promoCodeId?: string;
                             total: string;
                             paymentMethod: string;
                             /** @enum {string} */
                             paymentStatus?: "pending" | "completed" | "pending_refund" | "refunded";
                             cashReceived?: string;
+                            cashReceivedPrimary?: string;
+                            cashReceivedSecondary?: string;
+                            changeGivenSecondary?: string;
                             notes?: string;
                             customerName?: string;
                             customerPhone?: string;
@@ -4328,9 +4356,14 @@ export interface operations {
                             id: string;
                             name: string;
                             barcode: string | null;
+                            sku: string | null;
+                            image: string | null;
+                            categoryName: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             updatedAt: string;
+                            deleted: boolean;
                         }[];
                         sales: {
                             id: string;
@@ -4514,6 +4547,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4580,6 +4614,7 @@ export interface operations {
                     supplierId?: string;
                     costPrice?: string;
                     sellingPrice: string;
+                    secondaryPrice?: string | null;
                     stockQuantity?: number;
                     lowStockThreshold?: number;
                     unit?: string;
@@ -4697,6 +4732,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4769,6 +4805,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4828,6 +4865,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4916,6 +4954,7 @@ export interface operations {
                     supplierId?: string;
                     costPrice?: string;
                     sellingPrice?: string;
+                    secondaryPrice?: string | null;
                     stockQuantity?: number;
                     lowStockThreshold?: number;
                     unit?: string;
@@ -8237,6 +8276,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -8393,6 +8433,7 @@ export interface operations {
                             unitPrice: string;
                             discount: string;
                             total: string;
+                            secondaryUnitPrice?: string | null;
                         }[];
                         subtotal: string;
                         taxAmount: string;
@@ -8425,6 +8466,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -8766,6 +8808,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -8853,6 +8896,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -8945,6 +8989,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9038,6 +9083,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9122,6 +9168,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9206,6 +9253,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9294,6 +9342,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -9351,6 +9400,7 @@ export interface operations {
                             unitPrice: string;
                             discount: string;
                             total: string;
+                            secondaryUnitPrice?: string | null;
                         }[];
                         subtotal: string;
                         taxAmount: string;
@@ -9448,6 +9498,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9607,6 +9658,7 @@ export interface operations {
                             id: string;
                             name: string;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
@@ -9678,6 +9730,7 @@ export interface operations {
                             id: string;
                             name: string;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
@@ -10205,6 +10258,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10267,6 +10322,7 @@ export interface operations {
             content: {
                 "application/json": {
                     startingCashFloat?: string;
+                    startingCashFloatSecondary?: string;
                 };
             };
         };
@@ -10287,6 +10343,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10369,6 +10427,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10441,6 +10501,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10451,8 +10513,14 @@ export interface operations {
                             cashSales: string;
                             cardSales: string;
                             otherSales: string;
+                            cashReceivedPrimary: string;
+                            changeGivenPrimary: string;
+                            cashReceivedSecondary: string;
+                            changeGivenSecondary: string;
                             expectedCash: string;
+                            expectedCashSecondary: string | null;
                             overShort: string | null;
+                            overShortSecondary: string | null;
                         };
                     };
                 };
@@ -10519,6 +10587,7 @@ export interface operations {
             content: {
                 "application/json": {
                     endingCashFloat?: string;
+                    endingCashFloatSecondary?: string;
                     notes?: string;
                 };
             };
@@ -10540,6 +10609,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10550,8 +10621,14 @@ export interface operations {
                             cashSales: string;
                             cardSales: string;
                             otherSales: string;
+                            cashReceivedPrimary: string;
+                            changeGivenPrimary: string;
+                            cashReceivedSecondary: string;
+                            changeGivenSecondary: string;
                             expectedCash: string;
+                            expectedCashSecondary: string | null;
                             overShort: string | null;
+                            overShortSecondary: string | null;
                         };
                     };
                 };

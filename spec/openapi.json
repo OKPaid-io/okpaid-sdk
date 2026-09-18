@@ -955,6 +955,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -1006,6 +1021,10 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
@@ -1236,6 +1255,25 @@
                     "maxLength": 50,
                     "nullable": true
                   },
+                  "dualCurrencyEnabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "exchangeRate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
+                  },
+                  "receiptCurrencyMode": {
+                    "type": "string",
+                    "enum": ["dual", "primary", "secondary"],
+                    "nullable": true
+                  },
+                  "secondaryCurrency": {
+                    "type": "string",
+                    "maxLength": 3,
+                    "nullable": true
+                  },
                   "barcodeFieldsConfig": {
                     "type": "object",
                     "properties": {
@@ -1359,6 +1397,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -1410,6 +1463,10 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
@@ -1518,9 +1575,17 @@
                   "country": {
                     "type": "string",
                     "minLength": 1
+                  },
+                  "dualCurrencyEnabled": {
+                    "type": "boolean"
+                  },
+                  "exchangeRate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
                   }
                 },
-                "required": ["currency", "timezone", "country"]
+                "required": ["currency", "timezone", "country", "dualCurrencyEnabled", "exchangeRate"]
               }
             }
           }
@@ -1610,6 +1675,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -1661,6 +1741,10 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
@@ -3862,6 +3946,10 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "promoDiscountAmount": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
                   "promoCodeId": {
                     "type": "string"
                   },
@@ -3878,6 +3966,18 @@
                     "enum": ["pending", "completed", "pending_refund", "refunded"]
                   },
                   "cashReceived": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedPrimary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "changeGivenSecondary": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
@@ -4034,30 +4134,6 @@
                     }
                   },
                   "required": ["error"],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "429 Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "currentCount": {
-                      "type": "number"
-                    },
-                    "maxCount": {
-                      "type": "number",
-                      "nullable": true
-                    }
-                  },
-                  "required": ["error", "currentCount", "maxCount"],
                   "additionalProperties": false
                 }
               }
@@ -4676,11 +4752,26 @@
                         "cartDiscountAmount": {
                           "type": "string"
                         },
+                        "promoDiscountAmount": {
+                          "type": "string"
+                        },
                         "promoCodeId": {
                           "type": "string",
                           "nullable": true
                         },
                         "shiftId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedPrimary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "changeGivenSecondary": {
                           "type": "string",
                           "nullable": true
                         },
@@ -4766,8 +4857,12 @@
                         "organizationId",
                         "userId",
                         "cartDiscountAmount",
+                        "promoDiscountAmount",
                         "promoCodeId",
                         "shiftId",
+                        "cashReceivedPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "holdStatus",
                         "holdExpiresAt",
                         "notes",
@@ -4894,6 +4989,18 @@
                   "cashReceived": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedPrimary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "changeGivenSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
                   }
                 },
                 "required": ["paymentStatus"]
@@ -4961,11 +5068,26 @@
                         "cartDiscountAmount": {
                           "type": "string"
                         },
+                        "promoDiscountAmount": {
+                          "type": "string"
+                        },
                         "promoCodeId": {
                           "type": "string",
                           "nullable": true
                         },
                         "shiftId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedPrimary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "changeGivenSecondary": {
                           "type": "string",
                           "nullable": true
                         },
@@ -5002,8 +5124,12 @@
                         "organizationId",
                         "userId",
                         "cartDiscountAmount",
+                        "promoDiscountAmount",
                         "promoCodeId",
                         "shiftId",
+                        "cashReceivedPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "holdStatus",
                         "holdExpiresAt",
                         "notes",
@@ -5932,6 +6058,10 @@
                               "type": "string",
                               "pattern": "^\\d+(\\.\\d{1,2})?$"
                             },
+                            "promoDiscountAmount": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
                             "promoCodeId": {
                               "type": "string"
                             },
@@ -5948,6 +6078,18 @@
                               "enum": ["pending", "completed", "pending_refund", "refunded"]
                             },
                             "cashReceived": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "cashReceivedPrimary": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "cashReceivedSecondary": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$"
+                            },
+                            "changeGivenSecondary": {
                               "type": "string",
                               "pattern": "^\\d+(\\.\\d{1,2})?$"
                             },
@@ -6150,17 +6292,48 @@
                             "type": "string",
                             "nullable": true
                           },
+                          "sku": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "image": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "categoryName": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "sellingPrice": {
                             "type": "string"
+                          },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
                           },
                           "stockQuantity": {
                             "type": "number"
                           },
                           "updatedAt": {
                             "type": "string"
+                          },
+                          "deleted": {
+                            "type": "boolean"
                           }
                         },
-                        "required": ["id", "name", "barcode", "sellingPrice", "stockQuantity", "updatedAt"],
+                        "required": [
+                          "id",
+                          "name",
+                          "barcode",
+                          "sku",
+                          "image",
+                          "categoryName",
+                          "sellingPrice",
+                          "secondaryPrice",
+                          "stockQuantity",
+                          "updatedAt",
+                          "deleted"
+                        ],
                         "additionalProperties": false
                       }
                     },
@@ -6502,6 +6675,11 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "secondaryPrice": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
+                  },
                   "stockQuantity": {
                     "type": "integer",
                     "minimum": 0,
@@ -6775,6 +6953,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -6799,6 +6981,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -6938,6 +7121,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -6966,6 +7153,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -7089,6 +7277,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -7113,6 +7305,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -7223,6 +7416,10 @@
                         "sellingPrice": {
                           "type": "string"
                         },
+                        "secondaryPrice": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "stockQuantity": {
                           "type": "number"
                         },
@@ -7285,6 +7482,7 @@
                         "name",
                         "image",
                         "sellingPrice",
+                        "secondaryPrice",
                         "stockQuantity",
                         "lowStockThreshold",
                         "isActive",
@@ -7438,6 +7636,11 @@
                   "sellingPrice": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "secondaryPrice": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
                   },
                   "stockQuantity": {
                     "type": "integer",
@@ -14099,6 +14302,11 @@
                                   },
                                   "total": {
                                     "type": "string"
+                                  },
+                                  "secondaryUnitPrice": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                    "nullable": true
                                   }
                                 },
                                 "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -14290,6 +14498,11 @@
                             },
                             "total": {
                               "type": "string"
+                            },
+                            "secondaryUnitPrice": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$",
+                              "nullable": true
                             }
                           },
                           "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"]
@@ -14371,6 +14584,11 @@
                                   },
                                   "total": {
                                     "type": "string"
+                                  },
+                                  "secondaryUnitPrice": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                    "nullable": true
                                   }
                                 },
                                 "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15122,6 +15340,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15327,6 +15550,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15496,6 +15724,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15680,6 +15913,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15840,6 +16078,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16002,6 +16245,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16157,6 +16405,11 @@
                             },
                             "total": {
                               "type": "string"
+                            },
+                            "secondaryUnitPrice": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$",
+                              "nullable": true
                             }
                           },
                           "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"]
@@ -16344,6 +16597,11 @@
                                     },
                                     "total": {
                                       "type": "string"
+                                    },
+                                    "secondaryUnitPrice": {
+                                      "type": "string",
+                                      "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                      "nullable": true
                                     }
                                   },
                                   "required": [
@@ -16512,6 +16770,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16825,6 +17088,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "image": {
                             "type": "string",
                             "nullable": true
@@ -16844,6 +17111,7 @@
                           "id",
                           "name",
                           "sellingPrice",
+                          "secondaryPrice",
                           "image",
                           "stockQuantity",
                           "categoryName",
@@ -16968,6 +17236,10 @@
                         "sellingPrice": {
                           "type": "string"
                         },
+                        "secondaryPrice": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "image": {
                           "type": "string",
                           "nullable": true
@@ -16980,7 +17252,15 @@
                           "nullable": true
                         }
                       },
-                      "required": ["id", "name", "sellingPrice", "image", "stockQuantity", "categoryName"],
+                      "required": [
+                        "id",
+                        "name",
+                        "sellingPrice",
+                        "secondaryPrice",
+                        "image",
+                        "stockQuantity",
+                        "categoryName"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -17942,6 +18222,10 @@
                   "startingCashFloat": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "startingCashFloatSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
                   }
                 }
               }
@@ -17986,6 +18270,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18006,6 +18298,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18192,6 +18486,14 @@
                             "type": "string",
                             "nullable": true
                           },
+                          "startingCashFloatSecondary": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "endingCashFloatSecondary": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "notes": {
                             "type": "string",
                             "nullable": true
@@ -18220,6 +18522,8 @@
                           "endedAt",
                           "startingCashFloat",
                           "endingCashFloat",
+                          "startingCashFloatSecondary",
+                          "endingCashFloatSecondary",
                           "notes",
                           "createdAt",
                           "updatedAt",
@@ -18355,6 +18659,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18375,6 +18687,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18507,6 +18821,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18527,6 +18849,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18551,10 +18875,30 @@
                         "otherSales": {
                           "type": "string"
                         },
+                        "cashReceivedPrimary": {
+                          "type": "string"
+                        },
+                        "changeGivenPrimary": {
+                          "type": "string"
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string"
+                        },
+                        "changeGivenSecondary": {
+                          "type": "string"
+                        },
                         "expectedCash": {
                           "type": "string"
                         },
+                        "expectedCashSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "overShort": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "overShortSecondary": {
                           "type": "string",
                           "nullable": true
                         }
@@ -18565,8 +18909,14 @@
                         "cashSales",
                         "cardSales",
                         "otherSales",
+                        "cashReceivedPrimary",
+                        "changeGivenPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "expectedCash",
-                        "overShort"
+                        "expectedCashSecondary",
+                        "overShort",
+                        "overShortSecondary"
                       ],
                       "additionalProperties": false
                     }
@@ -18684,6 +19034,10 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "endingCashFloatSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
                   "notes": {
                     "type": "string",
                     "maxLength": 1000
@@ -18731,6 +19085,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18751,6 +19113,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18775,10 +19139,30 @@
                         "otherSales": {
                           "type": "string"
                         },
+                        "cashReceivedPrimary": {
+                          "type": "string"
+                        },
+                        "changeGivenPrimary": {
+                          "type": "string"
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string"
+                        },
+                        "changeGivenSecondary": {
+                          "type": "string"
+                        },
                         "expectedCash": {
                           "type": "string"
                         },
+                        "expectedCashSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "overShort": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "overShortSecondary": {
                           "type": "string",
                           "nullable": true
                         }
@@ -18789,8 +19173,14 @@
                         "cashSales",
                         "cardSales",
                         "otherSales",
+                        "cashReceivedPrimary",
+                        "changeGivenPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "expectedCash",
-                        "overShort"
+                        "expectedCashSecondary",
+                        "overShort",
+                        "overShortSecondary"
                       ],
                       "additionalProperties": false
                     }
