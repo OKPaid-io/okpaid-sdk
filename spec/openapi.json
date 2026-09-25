@@ -955,6 +955,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -967,16 +982,102 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
-                        "billingAbaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "billingAcledaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
+                        "billingBankAccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "bank": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["bank", "accountNumber"],
+                            "additionalProperties": false
+                          }
                         },
                         "billingSupportEmail": {
                           "type": "string",
+                          "nullable": true
+                        },
+                        "khqrBakongAccountId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantCity": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantType": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrAcquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrSticker": {
+                          "type": "object",
+                          "properties": {
+                            "mobileNumber": {
+                              "type": "string",
+                              "maxLength": 32,
+                              "nullable": true
+                            },
+                            "accounts": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "nullable": true
+                            },
+                            "templates": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string"
+                                  },
+                                  "subtags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tag": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["tag", "value"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["tag", "subtags"],
+                                "additionalProperties": false
+                              },
+                              "nullable": true
+                            }
+                          },
+                          "required": ["accounts", "templates"],
+                          "additionalProperties": false,
                           "nullable": true
                         },
                         "createdAt": {
@@ -1006,13 +1107,23 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
-                        "billingAbaAccountNumber",
-                        "billingAcledaAccountNumber",
+                        "billingBankAccounts",
                         "billingSupportEmail",
+                        "khqrBakongAccountId",
+                        "khqrMerchantName",
+                        "khqrMerchantCity",
+                        "khqrMerchantType",
+                        "khqrMerchantId",
+                        "khqrAcquiringBank",
+                        "khqrSticker",
                         "createdAt",
                         "updatedAt"
                       ],
@@ -1172,14 +1283,25 @@
                     "maxLength": 2000,
                     "nullable": true
                   },
-                  "billingAbaAccountNumber": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "nullable": true
-                  },
-                  "billingAcledaAccountNumber": {
-                    "type": "string",
-                    "maxLength": 100,
+                  "billingBankAccounts": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "bank": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "accountNumber": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        }
+                      },
+                      "required": ["bank", "accountNumber"]
+                    },
                     "nullable": true
                   },
                   "billingSupportEmail": {
@@ -1193,20 +1315,6 @@
                         "maxLength": 255,
                         "format": "email",
                         "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-                      }
-                    ],
-                    "nullable": true
-                  },
-                  "paymentQrCode": {
-                    "anyOf": [
-                      {
-                        "type": "string",
-                        "enum": [""]
-                      },
-                      {
-                        "type": "string",
-                        "maxLength": 500,
-                        "format": "uri"
                       }
                     ],
                     "nullable": true
@@ -1234,6 +1342,25 @@
                   "dateFormat": {
                     "type": "string",
                     "maxLength": 50,
+                    "nullable": true
+                  },
+                  "dualCurrencyEnabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
+                  "exchangeRate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
+                  },
+                  "receiptCurrencyMode": {
+                    "type": "string",
+                    "enum": ["dual", "primary", "secondary"],
+                    "nullable": true
+                  },
+                  "secondaryCurrency": {
+                    "type": "string",
+                    "maxLength": 3,
                     "nullable": true
                   },
                   "barcodeFieldsConfig": {
@@ -1359,6 +1486,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -1371,16 +1513,102 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
-                        "billingAbaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "billingAcledaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
+                        "billingBankAccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "bank": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["bank", "accountNumber"],
+                            "additionalProperties": false
+                          }
                         },
                         "billingSupportEmail": {
                           "type": "string",
+                          "nullable": true
+                        },
+                        "khqrBakongAccountId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantCity": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantType": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrAcquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrSticker": {
+                          "type": "object",
+                          "properties": {
+                            "mobileNumber": {
+                              "type": "string",
+                              "maxLength": 32,
+                              "nullable": true
+                            },
+                            "accounts": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "nullable": true
+                            },
+                            "templates": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string"
+                                  },
+                                  "subtags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tag": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["tag", "value"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["tag", "subtags"],
+                                "additionalProperties": false
+                              },
+                              "nullable": true
+                            }
+                          },
+                          "required": ["accounts", "templates"],
+                          "additionalProperties": false,
                           "nullable": true
                         },
                         "createdAt": {
@@ -1410,13 +1638,23 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
-                        "billingAbaAccountNumber",
-                        "billingAcledaAccountNumber",
+                        "billingBankAccounts",
                         "billingSupportEmail",
+                        "khqrBakongAccountId",
+                        "khqrMerchantName",
+                        "khqrMerchantCity",
+                        "khqrMerchantType",
+                        "khqrMerchantId",
+                        "khqrAcquiringBank",
+                        "khqrSticker",
                         "createdAt",
                         "updatedAt"
                       ],
@@ -1518,9 +1756,17 @@
                   "country": {
                     "type": "string",
                     "minLength": 1
+                  },
+                  "dualCurrencyEnabled": {
+                    "type": "boolean"
+                  },
+                  "exchangeRate": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
                   }
                 },
-                "required": ["currency", "timezone", "country"]
+                "required": ["currency", "timezone", "country", "dualCurrencyEnabled", "exchangeRate"]
               }
             }
           }
@@ -1610,6 +1856,21 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "dualCurrencyEnabled": {
+                          "type": "boolean"
+                        },
+                        "exchangeRate": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "receiptCurrencyMode": {
+                          "type": "string",
+                          "enum": ["dual", "primary", "secondary"]
+                        },
+                        "secondaryCurrency": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "barcodeFieldsConfig": {
                           "nullable": true
                         },
@@ -1622,16 +1883,102 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
-                        "billingAbaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "billingAcledaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
+                        "billingBankAccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "bank": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["bank", "accountNumber"],
+                            "additionalProperties": false
+                          }
                         },
                         "billingSupportEmail": {
                           "type": "string",
+                          "nullable": true
+                        },
+                        "khqrBakongAccountId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantCity": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantType": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrAcquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrSticker": {
+                          "type": "object",
+                          "properties": {
+                            "mobileNumber": {
+                              "type": "string",
+                              "maxLength": 32,
+                              "nullable": true
+                            },
+                            "accounts": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "nullable": true
+                            },
+                            "templates": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string"
+                                  },
+                                  "subtags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tag": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["tag", "value"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["tag", "subtags"],
+                                "additionalProperties": false
+                              },
+                              "nullable": true
+                            }
+                          },
+                          "required": ["accounts", "templates"],
+                          "additionalProperties": false,
                           "nullable": true
                         },
                         "createdAt": {
@@ -1661,13 +2008,23 @@
                         "currency",
                         "timezone",
                         "dateFormat",
+                        "dualCurrencyEnabled",
+                        "exchangeRate",
+                        "receiptCurrencyMode",
+                        "secondaryCurrency",
                         "barcodeFieldsConfig",
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
-                        "billingAbaAccountNumber",
-                        "billingAcledaAccountNumber",
+                        "billingBankAccounts",
                         "billingSupportEmail",
+                        "khqrBakongAccountId",
+                        "khqrMerchantName",
+                        "khqrMerchantCity",
+                        "khqrMerchantType",
+                        "khqrMerchantId",
+                        "khqrAcquiringBank",
+                        "khqrSticker",
                         "createdAt",
                         "updatedAt"
                       ],
@@ -1763,20 +2120,116 @@
                     "billingSettings": {
                       "type": "object",
                       "properties": {
-                        "billingAbaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "billingAcledaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
+                        "billingBankAccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "bank": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["bank", "accountNumber"],
+                            "additionalProperties": false
+                          }
                         },
                         "billingSupportEmail": {
                           "type": "string",
                           "nullable": true
+                        },
+                        "khqrBakongAccountId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantCity": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantType": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrAcquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrSticker": {
+                          "type": "object",
+                          "properties": {
+                            "mobileNumber": {
+                              "type": "string",
+                              "maxLength": 32,
+                              "nullable": true
+                            },
+                            "accounts": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "nullable": true
+                            },
+                            "templates": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string"
+                                  },
+                                  "subtags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tag": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["tag", "value"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["tag", "subtags"],
+                                "additionalProperties": false
+                              },
+                              "nullable": true
+                            }
+                          },
+                          "required": ["accounts", "templates"],
+                          "additionalProperties": false,
+                          "nullable": true
                         }
                       },
-                      "required": ["billingAbaAccountNumber", "billingAcledaAccountNumber", "billingSupportEmail"],
+                      "required": [
+                        "billingBankAccounts",
+                        "billingSupportEmail",
+                        "khqrBakongAccountId",
+                        "khqrMerchantName",
+                        "khqrMerchantCity",
+                        "khqrMerchantType",
+                        "khqrMerchantId",
+                        "khqrAcquiringBank",
+                        "khqrSticker"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -1843,14 +2296,25 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "billingAbaAccountNumber": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "nullable": true
-                  },
-                  "billingAcledaAccountNumber": {
-                    "type": "string",
-                    "maxLength": 100,
+                  "billingBankAccounts": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "bank": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "accountNumber": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        }
+                      },
+                      "required": ["bank", "accountNumber"]
+                    },
                     "nullable": true
                   },
                   "billingSupportEmail": {
@@ -1866,6 +2330,98 @@
                         "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                       }
                     ],
+                    "nullable": true
+                  },
+                  "khqrBakongAccountId": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true
+                  },
+                  "khqrMerchantName": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true
+                  },
+                  "khqrMerchantCity": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true
+                  },
+                  "khqrMerchantType": {
+                    "type": "string",
+                    "maxLength": 2,
+                    "nullable": true
+                  },
+                  "khqrMerchantId": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true
+                  },
+                  "khqrAcquiringBank": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true
+                  },
+                  "khqrSticker": {
+                    "type": "object",
+                    "properties": {
+                      "mobileNumber": {
+                        "type": "string",
+                        "maxLength": 32,
+                        "nullable": true
+                      },
+                      "accounts": {
+                        "type": "object",
+                        "properties": {
+                          "USD": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "nullable": true
+                          },
+                          "KHR": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "nullable": true
+                          }
+                        },
+                        "nullable": true
+                      },
+                      "templates": {
+                        "maxItems": 10,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "tag": {
+                              "type": "string",
+                              "pattern": "^\\d{2}$"
+                            },
+                            "subtags": {
+                              "maxItems": 20,
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string",
+                                    "pattern": "^\\d{2}$"
+                                  },
+                                  "value": {
+                                    "type": "string",
+                                    "maxLength": 99
+                                  }
+                                },
+                                "required": ["tag", "value"]
+                              }
+                            }
+                          },
+                          "required": ["tag", "subtags"]
+                        },
+                        "nullable": true
+                      }
+                    },
                     "nullable": true
                   }
                 }
@@ -1884,20 +2440,116 @@
                     "billingSettings": {
                       "type": "object",
                       "properties": {
-                        "billingAbaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "billingAcledaAccountNumber": {
-                          "type": "string",
-                          "nullable": true
+                        "billingBankAccounts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "bank": {
+                                "type": "string"
+                              },
+                              "accountNumber": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["bank", "accountNumber"],
+                            "additionalProperties": false
+                          }
                         },
                         "billingSupportEmail": {
                           "type": "string",
                           "nullable": true
+                        },
+                        "khqrBakongAccountId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantCity": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantType": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrMerchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrAcquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "khqrSticker": {
+                          "type": "object",
+                          "properties": {
+                            "mobileNumber": {
+                              "type": "string",
+                              "maxLength": 32,
+                              "nullable": true
+                            },
+                            "accounts": {
+                              "type": "object",
+                              "propertyNames": {
+                                "type": "string"
+                              },
+                              "additionalProperties": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "nullable": true
+                            },
+                            "templates": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "tag": {
+                                    "type": "string"
+                                  },
+                                  "subtags": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "tag": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["tag", "value"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["tag", "subtags"],
+                                "additionalProperties": false
+                              },
+                              "nullable": true
+                            }
+                          },
+                          "required": ["accounts", "templates"],
+                          "additionalProperties": false,
+                          "nullable": true
                         }
                       },
-                      "required": ["billingAbaAccountNumber", "billingAcledaAccountNumber", "billingSupportEmail"],
+                      "required": [
+                        "billingBankAccounts",
+                        "billingSupportEmail",
+                        "khqrBakongAccountId",
+                        "khqrMerchantName",
+                        "khqrMerchantCity",
+                        "khqrMerchantType",
+                        "khqrMerchantId",
+                        "khqrAcquiringBank",
+                        "khqrSticker"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -3816,6 +4468,344 @@
         "operationId": "delete_api_v1_organizations__orgId__roles__roleId"
       }
     },
+    "/api/v1/organizations/{orgId}/staff-pins": {
+      "get": {
+        "tags": ["Staff PINs"],
+        "summary": "List PIN staff for an organization",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "memberId": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "disabled": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["memberId", "name", "disabled", "createdAt", "updatedAt"],
+                    "additionalProperties": false
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_api_v1_organizations__orgId__staff_pins"
+      },
+      "post": {
+        "tags": ["Staff PINs"],
+        "summary": "Create a PIN staff member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "pin": {
+                    "type": "string",
+                    "pattern": "^\\d{4,6}$"
+                  }
+                },
+                "required": ["name", "pin"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memberId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["memberId", "name"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post_api_v1_organizations__orgId__staff_pins"
+      }
+    },
+    "/api/v1/organizations/{orgId}/staff-pins/{memberId}": {
+      "patch": {
+        "tags": ["Staff PINs"],
+        "summary": "Update a PIN staff member's PIN or disabled state",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "memberId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "pin": {
+                    "type": "string",
+                    "pattern": "^\\d{4,6}$"
+                  },
+                  "disabled": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memberId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "disabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["memberId", "name", "disabled"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "404 Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "patch_api_v1_organizations__orgId__staff_pins__memberId"
+      }
+    },
     "/api/v1/organizations/{orgId}/sales": {
       "post": {
         "tags": ["Sales"],
@@ -3862,6 +4852,10 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "promoDiscountAmount": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
                   "promoCodeId": {
                     "type": "string"
                   },
@@ -3878,6 +4872,18 @@
                     "enum": ["pending", "completed", "pending_refund", "refunded"]
                   },
                   "cashReceived": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedPrimary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "changeGivenSecondary": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
@@ -4034,30 +5040,6 @@
                     }
                   },
                   "required": ["error"],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "429 Too Many Requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "currentCount": {
-                      "type": "number"
-                    },
-                    "maxCount": {
-                      "type": "number",
-                      "nullable": true
-                    }
-                  },
-                  "required": ["error", "currentCount", "maxCount"],
                   "additionalProperties": false
                 }
               }
@@ -4676,11 +5658,26 @@
                         "cartDiscountAmount": {
                           "type": "string"
                         },
+                        "promoDiscountAmount": {
+                          "type": "string"
+                        },
                         "promoCodeId": {
                           "type": "string",
                           "nullable": true
                         },
                         "shiftId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedPrimary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "changeGivenSecondary": {
                           "type": "string",
                           "nullable": true
                         },
@@ -4766,8 +5763,12 @@
                         "organizationId",
                         "userId",
                         "cartDiscountAmount",
+                        "promoDiscountAmount",
                         "promoCodeId",
                         "shiftId",
+                        "cashReceivedPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "holdStatus",
                         "holdExpiresAt",
                         "notes",
@@ -4894,6 +5895,18 @@
                   "cashReceived": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedPrimary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "cashReceivedSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "changeGivenSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
                   }
                 },
                 "required": ["paymentStatus"]
@@ -4961,11 +5974,26 @@
                         "cartDiscountAmount": {
                           "type": "string"
                         },
+                        "promoDiscountAmount": {
+                          "type": "string"
+                        },
                         "promoCodeId": {
                           "type": "string",
                           "nullable": true
                         },
                         "shiftId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedPrimary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "changeGivenSecondary": {
                           "type": "string",
                           "nullable": true
                         },
@@ -5002,8 +6030,12 @@
                         "organizationId",
                         "userId",
                         "cartDiscountAmount",
+                        "promoDiscountAmount",
                         "promoCodeId",
                         "shiftId",
+                        "cashReceivedPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "holdStatus",
                         "holdExpiresAt",
                         "notes",
@@ -5870,7 +6902,7 @@
       "post": {
         "tags": ["Sync"],
         "summary": "Apply outbox operations (offline sync push)",
-        "description": "Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' only; each op is applied in its own transaction with the same guards as POST /:orgId/sales, and a replayed sale id is a no-op reported as 'duplicate'.",
+        "description": "Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' and 'khqr_payment.upsert'; each op is applied in its own transaction with the same guards as the online routes, and a replayed op is a no-op reported as 'duplicate'.",
         "parameters": [
           {
             "in": "path",
@@ -5905,97 +6937,174 @@
                           "minLength": 1
                         },
                         "payload": {
-                          "type": "object",
-                          "properties": {
-                            "receiptNumber": {
-                              "type": "string",
-                              "minLength": 1
-                            },
-                            "id": {
-                              "type": "string",
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                            },
-                            "subtotal": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "taxAmount": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "discountAmount": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "cartDiscountAmount": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "promoCodeId": {
-                              "type": "string"
-                            },
-                            "total": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "paymentMethod": {
-                              "type": "string",
-                              "minLength": 1
-                            },
-                            "paymentStatus": {
-                              "type": "string",
-                              "enum": ["pending", "completed", "pending_refund", "refunded"]
-                            },
-                            "cashReceived": {
-                              "type": "string",
-                              "pattern": "^\\d+(\\.\\d{1,2})?$"
-                            },
-                            "notes": {
-                              "type": "string"
-                            },
-                            "customerName": {
-                              "type": "string"
-                            },
-                            "customerPhone": {
-                              "type": "string"
-                            },
-                            "items": {
-                              "minItems": 1,
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "productId": {
-                                    "type": "string"
-                                  },
-                                  "productName": {
-                                    "type": "string",
-                                    "minLength": 1
-                                  },
-                                  "productBarcode": {
-                                    "type": "string"
-                                  },
-                                  "quantity": {
-                                    "type": "integer",
-                                    "exclusiveMinimum": true,
-                                    "maximum": 9007199254740991,
-                                    "minimum": 0
-                                  },
-                                  "unitPrice": {
-                                    "type": "string",
-                                    "pattern": "^\\d+(\\.\\d{1,2})?$"
-                                  },
-                                  "discount": {
-                                    "type": "string",
-                                    "pattern": "^\\d+(\\.\\d{1,2})?$"
-                                  }
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "receiptNumber": {
+                                  "type": "string",
+                                  "minLength": 1
                                 },
-                                "required": ["productName", "quantity", "unitPrice"]
-                              }
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                },
+                                "subtotal": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "taxAmount": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "discountAmount": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "cartDiscountAmount": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "promoDiscountAmount": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "promoCodeId": {
+                                  "type": "string"
+                                },
+                                "total": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "paymentMethod": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "paymentStatus": {
+                                  "type": "string",
+                                  "enum": ["pending", "completed", "pending_refund", "refunded"]
+                                },
+                                "cashReceived": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "cashReceivedPrimary": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "cashReceivedSecondary": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "changeGivenSecondary": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "notes": {
+                                  "type": "string"
+                                },
+                                "customerName": {
+                                  "type": "string"
+                                },
+                                "customerPhone": {
+                                  "type": "string"
+                                },
+                                "items": {
+                                  "minItems": 1,
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "productId": {
+                                        "type": "string"
+                                      },
+                                      "productName": {
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "productBarcode": {
+                                        "type": "string"
+                                      },
+                                      "quantity": {
+                                        "type": "integer",
+                                        "exclusiveMinimum": true,
+                                        "maximum": 9007199254740991,
+                                        "minimum": 0
+                                      },
+                                      "unitPrice": {
+                                        "type": "string",
+                                        "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                      },
+                                      "discount": {
+                                        "type": "string",
+                                        "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                      }
+                                    },
+                                    "required": ["productName", "quantity", "unitPrice"]
+                                  }
+                                }
+                              },
+                              "required": ["receiptNumber", "subtotal", "total", "paymentMethod", "items"]
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                },
+                                "saleId": {
+                                  "type": "string",
+                                  "format": "uuid",
+                                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                },
+                                "receiptNumber": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 50
+                                },
+                                "qrString": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 1024
+                                },
+                                "qrMd5": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{32}$"
+                                },
+                                "amount": {
+                                  "type": "string",
+                                  "pattern": "^\\d+(\\.\\d{1,2})?$"
+                                },
+                                "currency": {
+                                  "type": "string",
+                                  "enum": ["USD", "KHR"]
+                                },
+                                "expiresAt": {
+                                  "type": "string",
+                                  "format": "date-time",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "enum": ["pending", "paid", "canceled"]
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "saleId",
+                                "receiptNumber",
+                                "qrString",
+                                "qrMd5",
+                                "amount",
+                                "currency",
+                                "expiresAt",
+                                "status"
+                              ]
                             }
-                          },
-                          "required": ["receiptNumber", "subtotal", "total", "paymentMethod", "items"]
+                          ]
                         }
                       },
                       "required": ["idempotency_key", "op_type", "payload"]
@@ -6150,17 +7259,48 @@
                             "type": "string",
                             "nullable": true
                           },
+                          "sku": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "image": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "categoryName": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "sellingPrice": {
                             "type": "string"
+                          },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
                           },
                           "stockQuantity": {
                             "type": "number"
                           },
                           "updatedAt": {
                             "type": "string"
+                          },
+                          "deleted": {
+                            "type": "boolean"
                           }
                         },
-                        "required": ["id", "name", "barcode", "sellingPrice", "stockQuantity", "updatedAt"],
+                        "required": [
+                          "id",
+                          "name",
+                          "barcode",
+                          "sku",
+                          "image",
+                          "categoryName",
+                          "sellingPrice",
+                          "secondaryPrice",
+                          "stockQuantity",
+                          "updatedAt",
+                          "deleted"
+                        ],
                         "additionalProperties": false
                       }
                     },
@@ -6192,11 +7332,96 @@
                         "additionalProperties": false
                       }
                     },
+                    "khqr": {
+                      "type": "object",
+                      "properties": {
+                        "bakongAccountId": {
+                          "type": "string"
+                        },
+                        "merchantName": {
+                          "type": "string"
+                        },
+                        "merchantCity": {
+                          "type": "string"
+                        },
+                        "merchantType": {
+                          "type": "string",
+                          "enum": ["29", "30"]
+                        },
+                        "merchantId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "acquiringBank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "mobileNumber": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "accounts": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "templates": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "tag": {
+                                "type": "string"
+                              },
+                              "subtags": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "tag": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["tag", "value"],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": ["tag", "subtags"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "currency": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "bakongAccountId",
+                        "merchantName",
+                        "merchantCity",
+                        "merchantType",
+                        "merchantId",
+                        "acquiringBank",
+                        "mobileNumber",
+                        "accounts",
+                        "templates",
+                        "currency"
+                      ],
+                      "additionalProperties": false,
+                      "nullable": true
+                    },
                     "serverTime": {
                       "type": "string"
                     }
                   },
-                  "required": ["products", "sales", "serverTime"],
+                  "required": ["products", "sales", "khqr", "serverTime"],
                   "additionalProperties": false
                 }
               }
@@ -6502,6 +7727,11 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "secondaryPrice": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
+                  },
                   "stockQuantity": {
                     "type": "integer",
                     "minimum": 0,
@@ -6775,6 +8005,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -6799,6 +8033,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -6938,6 +8173,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -6966,6 +8205,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -7089,6 +8329,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "stockQuantity": {
                             "type": "number"
                           },
@@ -7113,6 +8357,7 @@
                           "name",
                           "image",
                           "sellingPrice",
+                          "secondaryPrice",
                           "stockQuantity",
                           "lowStockThreshold",
                           "isActive",
@@ -7223,6 +8468,10 @@
                         "sellingPrice": {
                           "type": "string"
                         },
+                        "secondaryPrice": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "stockQuantity": {
                           "type": "number"
                         },
@@ -7285,6 +8534,7 @@
                         "name",
                         "image",
                         "sellingPrice",
+                        "secondaryPrice",
                         "stockQuantity",
                         "lowStockThreshold",
                         "isActive",
@@ -7438,6 +8688,11 @@
                   "sellingPrice": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "secondaryPrice": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                    "nullable": true
                   },
                   "stockQuantity": {
                     "type": "integer",
@@ -14099,6 +15354,11 @@
                                   },
                                   "total": {
                                     "type": "string"
+                                  },
+                                  "secondaryUnitPrice": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                    "nullable": true
                                   }
                                 },
                                 "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -14290,6 +15550,11 @@
                             },
                             "total": {
                               "type": "string"
+                            },
+                            "secondaryUnitPrice": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$",
+                              "nullable": true
                             }
                           },
                           "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"]
@@ -14371,6 +15636,11 @@
                                   },
                                   "total": {
                                     "type": "string"
+                                  },
+                                  "secondaryUnitPrice": {
+                                    "type": "string",
+                                    "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                    "nullable": true
                                   }
                                 },
                                 "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15122,6 +16392,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15327,6 +16602,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15496,6 +16776,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15680,6 +16965,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -15840,6 +17130,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16002,6 +17297,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16157,6 +17457,11 @@
                             },
                             "total": {
                               "type": "string"
+                            },
+                            "secondaryUnitPrice": {
+                              "type": "string",
+                              "pattern": "^\\d+(\\.\\d{1,2})?$",
+                              "nullable": true
                             }
                           },
                           "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"]
@@ -16344,6 +17649,11 @@
                                     },
                                     "total": {
                                       "type": "string"
+                                    },
+                                    "secondaryUnitPrice": {
+                                      "type": "string",
+                                      "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                      "nullable": true
                                     }
                                   },
                                   "required": [
@@ -16512,6 +17822,11 @@
                               },
                               "total": {
                                 "type": "string"
+                              },
+                              "secondaryUnitPrice": {
+                                "type": "string",
+                                "pattern": "^\\d+(\\.\\d{1,2})?$",
+                                "nullable": true
                               }
                             },
                             "required": ["productId", "productName", "quantity", "unitPrice", "discount", "total"],
@@ -16825,6 +18140,10 @@
                           "sellingPrice": {
                             "type": "string"
                           },
+                          "secondaryPrice": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "image": {
                             "type": "string",
                             "nullable": true
@@ -16844,6 +18163,7 @@
                           "id",
                           "name",
                           "sellingPrice",
+                          "secondaryPrice",
                           "image",
                           "stockQuantity",
                           "categoryName",
@@ -16968,6 +18288,10 @@
                         "sellingPrice": {
                           "type": "string"
                         },
+                        "secondaryPrice": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "image": {
                           "type": "string",
                           "nullable": true
@@ -16980,7 +18304,15 @@
                           "nullable": true
                         }
                       },
-                      "required": ["id", "name", "sellingPrice", "image", "stockQuantity", "categoryName"],
+                      "required": [
+                        "id",
+                        "name",
+                        "sellingPrice",
+                        "secondaryPrice",
+                        "image",
+                        "stockQuantity",
+                        "categoryName"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -17124,6 +18456,9 @@
                         "disableMultipleDisplayPopup": {
                           "type": "boolean"
                         },
+                        "requireCashFloat": {
+                          "type": "boolean"
+                        },
                         "createdAt": {
                           "type": "string"
                         },
@@ -17141,6 +18476,7 @@
                         "theme",
                         "defaultDisplayMode",
                         "disableMultipleDisplayPopup",
+                        "requireCashFloat",
                         "createdAt",
                         "updatedAt"
                       ],
@@ -17237,6 +18573,9 @@
                   },
                   "disableMultipleDisplayPopup": {
                     "type": "boolean"
+                  },
+                  "requireCashFloat": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -17289,6 +18628,9 @@
                         "disableMultipleDisplayPopup": {
                           "type": "boolean"
                         },
+                        "requireCashFloat": {
+                          "type": "boolean"
+                        },
                         "createdAt": {
                           "type": "string"
                         },
@@ -17306,6 +18648,7 @@
                         "theme",
                         "defaultDisplayMode",
                         "disableMultipleDisplayPopup",
+                        "requireCashFloat",
                         "createdAt",
                         "updatedAt"
                       ],
@@ -17942,6 +19285,10 @@
                   "startingCashFloat": {
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
+                  "startingCashFloatSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
                   }
                 }
               }
@@ -17986,6 +19333,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18006,6 +19361,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18192,6 +19549,14 @@
                             "type": "string",
                             "nullable": true
                           },
+                          "startingCashFloatSecondary": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "endingCashFloatSecondary": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "notes": {
                             "type": "string",
                             "nullable": true
@@ -18220,6 +19585,8 @@
                           "endedAt",
                           "startingCashFloat",
                           "endingCashFloat",
+                          "startingCashFloatSecondary",
+                          "endingCashFloatSecondary",
                           "notes",
                           "createdAt",
                           "updatedAt",
@@ -18355,6 +19722,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18375,6 +19750,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18507,6 +19884,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18527,6 +19912,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18551,10 +19938,30 @@
                         "otherSales": {
                           "type": "string"
                         },
+                        "cashReceivedPrimary": {
+                          "type": "string"
+                        },
+                        "changeGivenPrimary": {
+                          "type": "string"
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string"
+                        },
+                        "changeGivenSecondary": {
+                          "type": "string"
+                        },
                         "expectedCash": {
                           "type": "string"
                         },
+                        "expectedCashSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "overShort": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "overShortSecondary": {
                           "type": "string",
                           "nullable": true
                         }
@@ -18565,8 +19972,14 @@
                         "cashSales",
                         "cardSales",
                         "otherSales",
+                        "cashReceivedPrimary",
+                        "changeGivenPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "expectedCash",
-                        "overShort"
+                        "expectedCashSecondary",
+                        "overShort",
+                        "overShortSecondary"
                       ],
                       "additionalProperties": false
                     }
@@ -18684,6 +20097,10 @@
                     "type": "string",
                     "pattern": "^\\d+(\\.\\d{1,2})?$"
                   },
+                  "endingCashFloatSecondary": {
+                    "type": "string",
+                    "pattern": "^\\d+(\\.\\d{1,2})?$"
+                  },
                   "notes": {
                     "type": "string",
                     "maxLength": 1000
@@ -18731,6 +20148,14 @@
                           "type": "string",
                           "nullable": true
                         },
+                        "startingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "endingCashFloatSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true
@@ -18751,6 +20176,8 @@
                         "endedAt",
                         "startingCashFloat",
                         "endingCashFloat",
+                        "startingCashFloatSecondary",
+                        "endingCashFloatSecondary",
                         "notes",
                         "createdAt",
                         "updatedAt"
@@ -18775,10 +20202,30 @@
                         "otherSales": {
                           "type": "string"
                         },
+                        "cashReceivedPrimary": {
+                          "type": "string"
+                        },
+                        "changeGivenPrimary": {
+                          "type": "string"
+                        },
+                        "cashReceivedSecondary": {
+                          "type": "string"
+                        },
+                        "changeGivenSecondary": {
+                          "type": "string"
+                        },
                         "expectedCash": {
                           "type": "string"
                         },
+                        "expectedCashSecondary": {
+                          "type": "string",
+                          "nullable": true
+                        },
                         "overShort": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "overShortSecondary": {
                           "type": "string",
                           "nullable": true
                         }
@@ -18789,8 +20236,14 @@
                         "cashSales",
                         "cardSales",
                         "otherSales",
+                        "cashReceivedPrimary",
+                        "changeGivenPrimary",
+                        "cashReceivedSecondary",
+                        "changeGivenSecondary",
                         "expectedCash",
-                        "overShort"
+                        "expectedCashSecondary",
+                        "overShort",
+                        "overShortSecondary"
                       ],
                       "additionalProperties": false
                     }

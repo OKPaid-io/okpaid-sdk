@@ -266,6 +266,41 @@ export interface paths {
         patch: operations["patch_api_v1_organizations__orgId__roles__roleId"];
         trace?: never;
     };
+    "/api/v1/organizations/{orgId}/staff-pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List PIN staff for an organization */
+        get: operations["get_api_v1_organizations__orgId__staff_pins"];
+        put?: never;
+        /** Create a PIN staff member */
+        post: operations["post_api_v1_organizations__orgId__staff_pins"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/staff-pins/{memberId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a PIN staff member's PIN or disabled state */
+        patch: operations["patch_api_v1_organizations__orgId__staff_pins__memberId"];
+        trace?: never;
+    };
     "/api/v1/organizations/{orgId}/sales": {
         parameters: {
             query?: never;
@@ -465,7 +500,7 @@ export interface paths {
         put?: never;
         /**
          * Apply outbox operations (offline sync push)
-         * @description Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' only; each op is applied in its own transaction with the same guards as POST /:orgId/sales, and a replayed sale id is a no-op reported as 'duplicate'.
+         * @description Applies a batch of outbox ops from an offline device. v1 supports op_type 'sale.create' and 'khqr_payment.upsert'; each op is applied in its own transaction with the same guards as the online routes, and a replayed op is a no-op reported as 'duplicate'.
          */
         post: operations["post_api_v1_organizations__orgId__sync_push"];
         delete?: never;
@@ -2031,13 +2066,39 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
-                            billingAbaAccountNumber: string | null;
-                            billingAcledaAccountNumber: string | null;
+                            billingBankAccounts: {
+                                bank: string;
+                                accountNumber: string;
+                            }[];
                             billingSupportEmail: string | null;
+                            khqrBakongAccountId: string | null;
+                            khqrMerchantName: string | null;
+                            khqrMerchantCity: string | null;
+                            khqrMerchantType: string | null;
+                            khqrMerchantId: string | null;
+                            khqrAcquiringBank: string | null;
+                            khqrSticker: {
+                                mobileNumber?: string | null;
+                                accounts: {
+                                    [key: string]: string | null;
+                                } | null;
+                                templates: {
+                                    tag: string;
+                                    subtags: {
+                                        tag: string;
+                                        value: string;
+                                    }[];
+                                }[] | null;
+                            } | null;
                             createdAt: string;
                             updatedAt: string;
                         } | null;
@@ -2094,15 +2155,21 @@ export interface operations {
                     invoicePrefix?: string | null;
                     invoiceFooter?: string | null;
                     invoiceTerms?: string | null;
-                    billingAbaAccountNumber?: string | null;
-                    billingAcledaAccountNumber?: string | null;
+                    billingBankAccounts?: {
+                        bank: string;
+                        accountNumber: string;
+                    }[] | null;
                     billingSupportEmail?: ("" | string) | null;
-                    paymentQrCode?: ("" | string) | null;
                     returnWindowDays?: number | null;
                     returnRequiresApproval?: boolean | null;
                     currency?: string | null;
                     timezone?: string | null;
                     dateFormat?: string | null;
+                    dualCurrencyEnabled?: boolean | null;
+                    exchangeRate?: string | null;
+                    /** @enum {string|null} */
+                    receiptCurrencyMode?: "dual" | "primary" | "secondary" | null;
+                    secondaryCurrency?: string | null;
                     barcodeFieldsConfig?: {
                         enabledFields: ("quantity" | "nutritionGrade" | "novaGroup" | "nutriments" | "allergens" | "ingredientsText" | "labels" | "origins" | "manufacturingPlaces" | "servingSize" | "packagingTags" | "categoriesTags")[];
                         showInProductForm: boolean;
@@ -2139,13 +2206,39 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
-                            billingAbaAccountNumber: string | null;
-                            billingAcledaAccountNumber: string | null;
+                            billingBankAccounts: {
+                                bank: string;
+                                accountNumber: string;
+                            }[];
                             billingSupportEmail: string | null;
+                            khqrBakongAccountId: string | null;
+                            khqrMerchantName: string | null;
+                            khqrMerchantCity: string | null;
+                            khqrMerchantType: string | null;
+                            khqrMerchantId: string | null;
+                            khqrAcquiringBank: string | null;
+                            khqrSticker: {
+                                mobileNumber?: string | null;
+                                accounts: {
+                                    [key: string]: string | null;
+                                } | null;
+                                templates: {
+                                    tag: string;
+                                    subtags: {
+                                        tag: string;
+                                        value: string;
+                                    }[];
+                                }[] | null;
+                            } | null;
                             createdAt: string;
                             updatedAt: string;
                         };
@@ -2204,6 +2297,8 @@ export interface operations {
                     currency: string;
                     timezone: string;
                     country: string;
+                    dualCurrencyEnabled: boolean;
+                    exchangeRate: string | null;
                 };
             };
         };
@@ -2235,13 +2330,39 @@ export interface operations {
                             currency: string | null;
                             timezone: string | null;
                             dateFormat: string | null;
+                            dualCurrencyEnabled: boolean;
+                            exchangeRate: string | null;
+                            /** @enum {string} */
+                            receiptCurrencyMode: "dual" | "primary" | "secondary";
+                            secondaryCurrency: string | null;
                             barcodeFieldsConfig: unknown;
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
-                            billingAbaAccountNumber: string | null;
-                            billingAcledaAccountNumber: string | null;
+                            billingBankAccounts: {
+                                bank: string;
+                                accountNumber: string;
+                            }[];
                             billingSupportEmail: string | null;
+                            khqrBakongAccountId: string | null;
+                            khqrMerchantName: string | null;
+                            khqrMerchantCity: string | null;
+                            khqrMerchantType: string | null;
+                            khqrMerchantId: string | null;
+                            khqrAcquiringBank: string | null;
+                            khqrSticker: {
+                                mobileNumber?: string | null;
+                                accounts: {
+                                    [key: string]: string | null;
+                                } | null;
+                                templates: {
+                                    tag: string;
+                                    subtags: {
+                                        tag: string;
+                                        value: string;
+                                    }[];
+                                }[] | null;
+                            } | null;
                             createdAt: string;
                             updatedAt: string;
                         };
@@ -2304,9 +2425,30 @@ export interface operations {
                 content: {
                     "application/json": {
                         billingSettings: {
-                            billingAbaAccountNumber: string | null;
-                            billingAcledaAccountNumber: string | null;
+                            billingBankAccounts: {
+                                bank: string;
+                                accountNumber: string;
+                            }[];
                             billingSupportEmail: string | null;
+                            khqrBakongAccountId: string | null;
+                            khqrMerchantName: string | null;
+                            khqrMerchantCity: string | null;
+                            khqrMerchantType: string | null;
+                            khqrMerchantId: string | null;
+                            khqrAcquiringBank: string | null;
+                            khqrSticker: {
+                                mobileNumber?: string | null;
+                                accounts: {
+                                    [key: string]: string | null;
+                                } | null;
+                                templates: {
+                                    tag: string;
+                                    subtags: {
+                                        tag: string;
+                                        value: string;
+                                    }[];
+                                }[] | null;
+                            } | null;
                         };
                     };
                 };
@@ -2347,9 +2489,31 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
-                    billingAbaAccountNumber?: string | null;
-                    billingAcledaAccountNumber?: string | null;
+                    billingBankAccounts?: {
+                        bank: string;
+                        accountNumber: string;
+                    }[] | null;
                     billingSupportEmail?: ("" | string) | null;
+                    khqrBakongAccountId?: string | null;
+                    khqrMerchantName?: string | null;
+                    khqrMerchantCity?: string | null;
+                    khqrMerchantType?: string | null;
+                    khqrMerchantId?: string | null;
+                    khqrAcquiringBank?: string | null;
+                    khqrSticker?: {
+                        mobileNumber?: string | null;
+                        accounts?: {
+                            USD?: string | null;
+                            KHR?: string | null;
+                        } | null;
+                        templates?: {
+                            tag: string;
+                            subtags: {
+                                tag: string;
+                                value: string;
+                            }[];
+                        }[] | null;
+                    } | null;
                 };
             };
         };
@@ -2362,9 +2526,30 @@ export interface operations {
                 content: {
                     "application/json": {
                         billingSettings: {
-                            billingAbaAccountNumber: string | null;
-                            billingAcledaAccountNumber: string | null;
+                            billingBankAccounts: {
+                                bank: string;
+                                accountNumber: string;
+                            }[];
                             billingSupportEmail: string | null;
+                            khqrBakongAccountId: string | null;
+                            khqrMerchantName: string | null;
+                            khqrMerchantCity: string | null;
+                            khqrMerchantType: string | null;
+                            khqrMerchantId: string | null;
+                            khqrAcquiringBank: string | null;
+                            khqrSticker: {
+                                mobileNumber?: string | null;
+                                accounts: {
+                                    [key: string]: string | null;
+                                } | null;
+                                templates: {
+                                    tag: string;
+                                    subtags: {
+                                        tag: string;
+                                        value: string;
+                                    }[];
+                                }[] | null;
+                            } | null;
                         };
                     };
                 };
@@ -3247,6 +3432,203 @@ export interface operations {
             };
         };
     };
+    get_api_v1_organizations__orgId__staff_pins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        memberId: string;
+                        name: string;
+                        disabled: boolean;
+                        createdAt: string;
+                        updatedAt: string;
+                    }[];
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__staff_pins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    name: string;
+                    pin: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 201 Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        memberId: string;
+                        name: string;
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    patch_api_v1_organizations__orgId__staff_pins__memberId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+                memberId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    pin?: string;
+                    disabled?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        memberId: string;
+                        name: string;
+                        disabled: boolean;
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 404 Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     get_api_v1_organizations__orgId__sales: {
         parameters: {
             query?: never;
@@ -3326,12 +3708,16 @@ export interface operations {
                     taxAmount?: string;
                     discountAmount?: string;
                     cartDiscountAmount?: string;
+                    promoDiscountAmount?: string;
                     promoCodeId?: string;
                     total: string;
                     paymentMethod: string;
                     /** @enum {string} */
                     paymentStatus?: "pending" | "completed" | "pending_refund" | "refunded";
                     cashReceived?: string;
+                    cashReceivedPrimary?: string;
+                    cashReceivedSecondary?: string;
+                    changeGivenSecondary?: string;
                     notes?: string;
                     customerName?: string;
                     customerPhone?: string;
@@ -3405,19 +3791,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
-                    };
-                };
-            };
-            /** @description 429 Too Many Requests */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error: string;
-                        currentCount: number;
-                        maxCount: number | null;
                     };
                 };
             };
@@ -3630,8 +4003,12 @@ export interface operations {
                             organizationId: string;
                             userId: string | null;
                             cartDiscountAmount: string;
+                            promoDiscountAmount: string;
                             promoCodeId: string | null;
                             shiftId: string | null;
+                            cashReceivedPrimary: string | null;
+                            cashReceivedSecondary: string | null;
+                            changeGivenSecondary: string | null;
                             holdStatus: string | null;
                             holdExpiresAt: string | null;
                             notes: string | null;
@@ -3715,6 +4092,9 @@ export interface operations {
                     /** @enum {string} */
                     paymentStatus: "pending" | "completed" | "pending_refund" | "refunded";
                     cashReceived?: string;
+                    cashReceivedPrimary?: string;
+                    cashReceivedSecondary?: string;
+                    changeGivenSecondary?: string;
                 };
             };
         };
@@ -3743,8 +4123,12 @@ export interface operations {
                             organizationId: string;
                             userId: string | null;
                             cartDiscountAmount: string;
+                            promoDiscountAmount: string;
                             promoCodeId: string | null;
                             shiftId: string | null;
+                            cashReceivedPrimary: string | null;
+                            cashReceivedSecondary: string | null;
+                            changeGivenSecondary: string | null;
                             holdStatus: string | null;
                             holdExpiresAt: string | null;
                             notes: string | null;
@@ -4227,12 +4611,16 @@ export interface operations {
                             taxAmount?: string;
                             discountAmount?: string;
                             cartDiscountAmount?: string;
+                            promoDiscountAmount?: string;
                             promoCodeId?: string;
                             total: string;
                             paymentMethod: string;
                             /** @enum {string} */
                             paymentStatus?: "pending" | "completed" | "pending_refund" | "refunded";
                             cashReceived?: string;
+                            cashReceivedPrimary?: string;
+                            cashReceivedSecondary?: string;
+                            changeGivenSecondary?: string;
                             notes?: string;
                             customerName?: string;
                             customerPhone?: string;
@@ -4244,6 +4632,21 @@ export interface operations {
                                 unitPrice: string;
                                 discount?: string;
                             }[];
+                        } | {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            saleId: string;
+                            receiptNumber: string;
+                            qrString: string;
+                            qrMd5: string;
+                            amount: string;
+                            /** @enum {string} */
+                            currency: "USD" | "KHR";
+                            /** Format: date-time */
+                            expiresAt: string;
+                            /** @enum {string} */
+                            status: "pending" | "paid" | "canceled";
                         };
                     }[];
                 };
@@ -4328,9 +4731,14 @@ export interface operations {
                             id: string;
                             name: string;
                             barcode: string | null;
+                            sku: string | null;
+                            image: string | null;
+                            categoryName: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             updatedAt: string;
+                            deleted: boolean;
                         }[];
                         sales: {
                             id: string;
@@ -4340,6 +4748,27 @@ export interface operations {
                             paymentStatus: string;
                             createdAt: string;
                         }[];
+                        khqr: {
+                            bakongAccountId: string;
+                            merchantName: string;
+                            merchantCity: string;
+                            /** @enum {string} */
+                            merchantType: "29" | "30";
+                            merchantId: string | null;
+                            acquiringBank: string | null;
+                            mobileNumber: string | null;
+                            accounts: {
+                                [key: string]: string;
+                            };
+                            templates: {
+                                tag: string;
+                                subtags: {
+                                    tag: string;
+                                    value: string;
+                                }[];
+                            }[];
+                            currency: string;
+                        } | null;
                         serverTime: string;
                     };
                 };
@@ -4514,6 +4943,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4580,6 +5010,7 @@ export interface operations {
                     supplierId?: string;
                     costPrice?: string;
                     sellingPrice: string;
+                    secondaryPrice?: string | null;
                     stockQuantity?: number;
                     lowStockThreshold?: number;
                     unit?: string;
@@ -4697,6 +5128,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4769,6 +5201,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4828,6 +5261,7 @@ export interface operations {
                             name: string;
                             image: string | null;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             stockQuantity: number;
                             lowStockThreshold: number | null;
                             isActive: boolean;
@@ -4916,6 +5350,7 @@ export interface operations {
                     supplierId?: string;
                     costPrice?: string;
                     sellingPrice?: string;
+                    secondaryPrice?: string | null;
                     stockQuantity?: number;
                     lowStockThreshold?: number;
                     unit?: string;
@@ -8237,6 +8672,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -8393,6 +8829,7 @@ export interface operations {
                             unitPrice: string;
                             discount: string;
                             total: string;
+                            secondaryUnitPrice?: string | null;
                         }[];
                         subtotal: string;
                         taxAmount: string;
@@ -8425,6 +8862,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -8766,6 +9204,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -8853,6 +9292,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -8945,6 +9385,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9038,6 +9479,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9122,6 +9564,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9206,6 +9649,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9294,6 +9738,7 @@ export interface operations {
                                     unitPrice: string;
                                     discount: string;
                                     total: string;
+                                    secondaryUnitPrice?: string | null;
                                 }[];
                                 subtotal: string;
                                 taxAmount: string;
@@ -9351,6 +9796,7 @@ export interface operations {
                             unitPrice: string;
                             discount: string;
                             total: string;
+                            secondaryUnitPrice?: string | null;
                         }[];
                         subtotal: string;
                         taxAmount: string;
@@ -9448,6 +9894,7 @@ export interface operations {
                                 unitPrice: string;
                                 discount: string;
                                 total: string;
+                                secondaryUnitPrice?: string | null;
                             }[];
                             subtotal: string;
                             taxAmount: string;
@@ -9607,6 +10054,7 @@ export interface operations {
                             id: string;
                             name: string;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
@@ -9678,6 +10126,7 @@ export interface operations {
                             id: string;
                             name: string;
                             sellingPrice: string;
+                            secondaryPrice: string | null;
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
@@ -9763,6 +10212,7 @@ export interface operations {
                             /** @enum {string} */
                             defaultDisplayMode: "grid" | "list";
                             disableMultipleDisplayPopup: boolean;
+                            requireCashFloat: boolean;
                             createdAt: string;
                             updatedAt: string;
                         };
@@ -9814,6 +10264,7 @@ export interface operations {
                     /** @enum {string} */
                     defaultDisplayMode?: "grid" | "list";
                     disableMultipleDisplayPopup?: boolean;
+                    requireCashFloat?: boolean;
                 };
             };
         };
@@ -9837,6 +10288,7 @@ export interface operations {
                             /** @enum {string} */
                             defaultDisplayMode: "grid" | "list";
                             disableMultipleDisplayPopup: boolean;
+                            requireCashFloat: boolean;
                             createdAt: string;
                             updatedAt: string;
                         };
@@ -10205,6 +10657,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10267,6 +10721,7 @@ export interface operations {
             content: {
                 "application/json": {
                     startingCashFloat?: string;
+                    startingCashFloatSecondary?: string;
                 };
             };
         };
@@ -10287,6 +10742,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10369,6 +10826,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10441,6 +10900,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10451,8 +10912,14 @@ export interface operations {
                             cashSales: string;
                             cardSales: string;
                             otherSales: string;
+                            cashReceivedPrimary: string;
+                            changeGivenPrimary: string;
+                            cashReceivedSecondary: string;
+                            changeGivenSecondary: string;
                             expectedCash: string;
+                            expectedCashSecondary: string | null;
                             overShort: string | null;
+                            overShortSecondary: string | null;
                         };
                     };
                 };
@@ -10519,6 +10986,7 @@ export interface operations {
             content: {
                 "application/json": {
                     endingCashFloat?: string;
+                    endingCashFloatSecondary?: string;
                     notes?: string;
                 };
             };
@@ -10540,6 +11008,8 @@ export interface operations {
                             endedAt: string | null;
                             startingCashFloat: string | null;
                             endingCashFloat: string | null;
+                            startingCashFloatSecondary: string | null;
+                            endingCashFloatSecondary: string | null;
                             notes: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -10550,8 +11020,14 @@ export interface operations {
                             cashSales: string;
                             cardSales: string;
                             otherSales: string;
+                            cashReceivedPrimary: string;
+                            changeGivenPrimary: string;
+                            cashReceivedSecondary: string;
+                            changeGivenSecondary: string;
                             expectedCash: string;
+                            expectedCashSecondary: string | null;
                             overShort: string | null;
+                            overShortSecondary: string | null;
                         };
                     };
                 };
