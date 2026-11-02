@@ -301,6 +301,23 @@ export interface paths {
         patch: operations["patch_api_v1_organizations__orgId__staff_pins__memberId"];
         trace?: never;
     };
+    "/api/v1/organizations/{orgId}/stock-receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Receive stock: create the receipt, raise stock, update cost, book the expense */
+        post: operations["post_api_v1_organizations__orgId__stock_receipts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{orgId}/sales": {
         parameters: {
             query?: never;
@@ -615,6 +632,41 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/products/{productId}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add variants to a product */
+        post: operations["post_api_v1_organizations__orgId__products__productId__variants"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/products/{productId}/variants/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete one variant (soft-delete tombstone) */
+        delete: operations["delete_api_v1_organizations__orgId__products__productId__variants__variantId"];
+        options?: never;
+        head?: never;
+        /** Update one variant */
+        patch: operations["patch_api_v1_organizations__orgId__products__productId__variants__variantId"];
         trace?: never;
     };
     "/api/v1/organizations/{orgId}/returns": {
@@ -1286,6 +1338,110 @@ export interface paths {
         head?: never;
         /** Update a kiosk banner */
         patch: operations["patch_api_v1_organizations__orgId__kiosk_banners__bannerId"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Notification feed (derived from sales, shifts and stock) with the unread count */
+        get: operations["get_api_v1_organizations__orgId__notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unread notification count for the current member */
+        get: operations["get_api_v1_organizations__orgId__notifications_unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the feed read up to now (also dismisses the stock items it just showed) */
+        post: operations["post_api_v1_organizations__orgId__notifications_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications/stock-ack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss one low/out-of-stock item for the whole organization */
+        post: operations["post_api_v1_organizations__orgId__notifications_stock_ack"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current member's notification preferences (defaults when never set) */
+        get: operations["get_api_v1_organizations__orgId__notifications_preferences"];
+        /** Update the current member's notification preferences */
+        put: operations["put_api_v1_organizations__orgId__notifications_preferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/notifications/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register this device for push (idempotent by endpoint) */
+        post: operations["post_api_v1_organizations__orgId__notifications_devices"];
+        /** Stop pushing to one of the caller's devices */
+        delete: operations["delete_api_v1_organizations__orgId__notifications_devices"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/organizations/{orgId}/shifts": {
@@ -2075,6 +2231,8 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            reportEnabled: boolean;
+                            reportHour: number | null;
                             billingBankAccounts: {
                                 bank: string;
                                 accountNumber: string;
@@ -2162,6 +2320,8 @@ export interface operations {
                     billingSupportEmail?: ("" | string) | null;
                     returnWindowDays?: number | null;
                     returnRequiresApproval?: boolean | null;
+                    reportEnabled?: boolean | null;
+                    reportHour?: number | null;
                     currency?: string | null;
                     timezone?: string | null;
                     dateFormat?: string | null;
@@ -2215,6 +2375,8 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            reportEnabled: boolean;
+                            reportHour: number | null;
                             billingBankAccounts: {
                                 bank: string;
                                 accountNumber: string;
@@ -2339,6 +2501,8 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            reportEnabled: boolean;
+                            reportHour: number | null;
                             billingBankAccounts: {
                                 bank: string;
                                 accountNumber: string;
@@ -3096,6 +3260,7 @@ export interface operations {
                         member?: ("create" | "read" | "update" | "delete")[];
                         invitation?: ("create" | "read" | "update" | "delete")[];
                         shift?: ("create" | "read" | "update")[];
+                        notification?: "read"[];
                     };
                 };
             };
@@ -3355,6 +3520,7 @@ export interface operations {
                         member?: ("create" | "read" | "update" | "delete")[];
                         invitation?: ("create" | "read" | "update" | "delete")[];
                         shift?: ("create" | "read" | "update")[];
+                        notification?: "read"[];
                     };
                 };
             };
@@ -3629,6 +3795,131 @@ export interface operations {
             };
         };
     };
+    post_api_v1_organizations__orgId__stock_receipts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    supplierId?: string | null;
+                    reference?: string;
+                    note?: string;
+                    /** Format: date-time */
+                    receivedAt?: string;
+                    /** Format: uuid */
+                    idempotencyKey: string;
+                    /** @default true */
+                    recordExpense?: boolean;
+                    items: {
+                        productId: string;
+                        quantity: number;
+                        unitCost: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        receipt: {
+                            id: string;
+                            supplierId: string | null;
+                            supplierName: string | null;
+                            expenseId: string | null;
+                            reference: string | null;
+                            note: string | null;
+                            totalCost: string;
+                            receivedAt: string;
+                            createdAt: string;
+                            items: {
+                                id: string;
+                                productId: string | null;
+                                productName: string | null;
+                                quantity: number;
+                                unitCost: string;
+                                lineTotal: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description 201 Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        receipt: {
+                            id: string;
+                            supplierId: string | null;
+                            supplierName: string | null;
+                            expenseId: string | null;
+                            reference: string | null;
+                            note: string | null;
+                            totalCost: string;
+                            receivedAt: string;
+                            createdAt: string;
+                            items: {
+                                id: string;
+                                productId: string | null;
+                                productName: string | null;
+                                quantity: number;
+                                unitCost: string;
+                                lineTotal: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     get_api_v1_organizations__orgId__sales: {
         parameters: {
             query?: never;
@@ -3650,6 +3941,7 @@ export interface operations {
                         sales: {
                             id: string;
                             receiptNumber: string;
+                            occurredAt: string | null;
                             subtotal: string;
                             taxAmount: string;
                             discountAmount: string;
@@ -3721,6 +4013,10 @@ export interface operations {
                     notes?: string;
                     customerName?: string;
                     customerPhone?: string;
+                    /** Format: date-time */
+                    occurredAt?: string;
+                    /** Format: date-time */
+                    sentAt?: string;
                     items: {
                         productId?: string;
                         productName: string;
@@ -3989,6 +4285,7 @@ export interface operations {
                         sale: {
                             id: string;
                             receiptNumber: string;
+                            occurredAt: string | null;
                             subtotal: string;
                             taxAmount: string;
                             discountAmount: string;
@@ -4109,6 +4406,7 @@ export interface operations {
                         sale: {
                             id: string;
                             receiptNumber: string;
+                            occurredAt: string | null;
                             subtotal: string;
                             taxAmount: string;
                             discountAmount: string;
@@ -4624,6 +4922,10 @@ export interface operations {
                             notes?: string;
                             customerName?: string;
                             customerPhone?: string;
+                            /** Format: date-time */
+                            occurredAt?: string;
+                            /** Format: date-time */
+                            sentAt?: string;
                             items: {
                                 productId?: string;
                                 productName: string;
@@ -4737,6 +5039,9 @@ export interface operations {
                             sellingPrice: string;
                             secondaryPrice: string | null;
                             stockQuantity: number;
+                            parentId: string | null;
+                            variantLabel: string | null;
+                            variantOrder: number;
                             updatedAt: string;
                             deleted: boolean;
                         }[];
@@ -4747,6 +5052,7 @@ export interface operations {
                             paymentMethod: string;
                             paymentStatus: string;
                             createdAt: string;
+                            occurredAt: string | null;
                         }[];
                         khqr: {
                             bakongAccountId: string;
@@ -5008,6 +5314,12 @@ export interface operations {
                     description?: string;
                     categoryId?: string;
                     supplierId?: string;
+                    variantOptions?: {
+                        axes: {
+                            name: string;
+                            values: string[];
+                        }[];
+                    };
                     costPrice?: string;
                     sellingPrice: string;
                     secondaryPrice?: string | null;
@@ -5046,6 +5358,17 @@ export interface operations {
                             [key: string]: unknown;
                         };
                     };
+                    variants?: {
+                        variantLabel: string;
+                        isActive?: boolean;
+                        variantOrder?: number;
+                        stockQuantity?: number;
+                        sellingPrice?: string;
+                        secondaryPrice?: string | null;
+                        costPrice?: string;
+                        barcode?: string;
+                        sku?: string;
+                    }[];
                 };
             };
         };
@@ -5135,6 +5458,8 @@ export interface operations {
                             createdAt: string;
                             updatedAt: string;
                             categoryId: string | null;
+                            parentId: string | null;
+                            variantLabel: string | null;
                         }[];
                     };
                 };
@@ -5271,12 +5596,46 @@ export interface operations {
                             description: string | null;
                             categoryId: string | null;
                             supplierId: string | null;
+                            parentId: string | null;
+                            variantLabel: string | null;
+                            variantOrder: number;
+                            variantOptions: unknown;
+                            priceOverridden: boolean;
                             costPrice: string | null;
                             unit: string | null;
                             brand: string | null;
                             dataSource: string | null;
                             dataSourceId: string | null;
                             extendedAttributes: unknown;
+                            variants: {
+                                id: string;
+                                barcode: string | null;
+                                sku: string | null;
+                                name: string;
+                                image: string | null;
+                                sellingPrice: string;
+                                secondaryPrice: string | null;
+                                stockQuantity: number;
+                                lowStockThreshold: number | null;
+                                isActive: boolean;
+                                createdAt: string;
+                                updatedAt: string;
+                                organizationId: string;
+                                description: string | null;
+                                categoryId: string | null;
+                                supplierId: string | null;
+                                parentId: string | null;
+                                variantLabel: string | null;
+                                variantOrder: number;
+                                variantOptions: unknown;
+                                priceOverridden: boolean;
+                                costPrice: string | null;
+                                unit: string | null;
+                                brand: string | null;
+                                dataSource: string | null;
+                                dataSourceId: string | null;
+                                extendedAttributes: unknown;
+                            }[];
                         };
                     };
                 };
@@ -5348,6 +5707,12 @@ export interface operations {
                     description?: string;
                     categoryId?: string;
                     supplierId?: string;
+                    variantOptions?: {
+                        axes: {
+                            name: string;
+                            values: string[];
+                        }[];
+                    };
                     costPrice?: string;
                     sellingPrice?: string;
                     secondaryPrice?: string | null;
@@ -5520,6 +5885,254 @@ export interface operations {
             };
             /** @description 500 Internal Server Error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__products__productId__variants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    variants: {
+                        variantLabel: string;
+                        isActive?: boolean;
+                        variantOrder?: number;
+                        stockQuantity?: number;
+                        sellingPrice?: string;
+                        secondaryPrice?: string | null;
+                        costPrice?: string;
+                        barcode?: string;
+                        sku?: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description 201 Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        variants: {
+                            id: string;
+                            variantLabel: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 404 Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    delete_api_v1_organizations__orgId__products__productId__variants__variantId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+                productId: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 404 Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    patch_api_v1_organizations__orgId__products__productId__variants__variantId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+                productId: string;
+                variantId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    variantLabel?: string;
+                    isActive?: boolean;
+                    variantOrder?: number;
+                    stockQuantity?: number;
+                    sellingPrice?: string;
+                    secondaryPrice?: string | null;
+                    costPrice?: string;
+                    barcode?: string;
+                    sku?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 404 Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7001,6 +7614,7 @@ export interface operations {
                 from?: string;
                 to?: string;
                 category?: "utilities" | "salaries" | "rent" | "supplies" | "marketing" | "maintenance" | "taxes" | "other";
+                supplierId?: string;
             };
             header?: never;
             path: {
@@ -7026,6 +7640,7 @@ export interface operations {
                             payee: string | null;
                             description: string | null;
                             recurringExpenseId: string | null;
+                            supplierId: string | null;
                             createdById: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -7088,6 +7703,7 @@ export interface operations {
                     expenseDate: string;
                     payee?: string;
                     description?: string;
+                    supplierId?: string | null;
                 };
             };
         };
@@ -7629,6 +8245,7 @@ export interface operations {
                             payee: string | null;
                             description: string | null;
                             recurringExpenseId: string | null;
+                            supplierId: string | null;
                             createdById: string | null;
                             createdAt: string;
                             updatedAt: string;
@@ -7774,6 +8391,7 @@ export interface operations {
                     expenseDate?: string;
                     payee?: string;
                     description?: string;
+                    supplierId?: string | null;
                 };
             };
         };
@@ -8245,7 +8863,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
@@ -8337,7 +8955,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
@@ -8426,7 +9044,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
@@ -10058,6 +10676,15 @@ export interface operations {
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
+                            variants: {
+                                id: string;
+                                label: string;
+                                stockQuantity: number;
+                                sellingPrice: string;
+                                secondaryPrice: string | null;
+                                barcode: string | null;
+                            }[];
+                            variantLabel: string | null;
                             popularityScore: number;
                         }[];
                         total: number;
@@ -10130,6 +10757,15 @@ export interface operations {
                             image: string | null;
                             stockQuantity: number;
                             categoryName: string | null;
+                            variants: {
+                                id: string;
+                                label: string;
+                                stockQuantity: number;
+                                sellingPrice: string;
+                                secondaryPrice: string | null;
+                                barcode: string | null;
+                            }[];
+                            variantLabel: string | null;
                         };
                     };
                 };
@@ -10613,6 +11249,523 @@ export interface operations {
             };
             /** @description 404 Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    get_api_v1_organizations__orgId__notifications: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            id: string;
+                            payload: {
+                                /** @enum {string} */
+                                type: "sale.completed";
+                                data: {
+                                    saleId: string;
+                                    receiptNumber: string;
+                                    staff: string;
+                                    amount: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "sale.digest";
+                                data: {
+                                    count: number;
+                                    amount: string;
+                                    saleIds: string[];
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "shift.opened";
+                                data: {
+                                    shiftId: string;
+                                    staff: string;
+                                    openingFloat: string;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "shift.closed";
+                                data: {
+                                    shiftId: string;
+                                    staff: string;
+                                    difference: string;
+                                    /** @enum {string} */
+                                    direction: "over" | "short" | "balanced";
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "stock.low";
+                                data: {
+                                    productId: string;
+                                    name: string;
+                                    remaining: number;
+                                    threshold: number;
+                                };
+                            } | {
+                                /** @enum {string} */
+                                type: "stock.out";
+                                data: {
+                                    productId: string;
+                                    name: string;
+                                };
+                            };
+                            at: string;
+                            read: boolean;
+                        }[];
+                        unreadCount: number;
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    get_api_v1_organizations__orgId__notifications_unread_count: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        unreadCount: number;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__notifications_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        lastSeenAt: string;
+                        dismissedStock: number;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__notifications_stock_ack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    productId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 404 Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    get_api_v1_organizations__orgId__notifications_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            saleAlerts: boolean;
+                            shiftAlerts: boolean;
+                            stockAlerts: boolean;
+                            reportEmail: boolean;
+                            quietFrom: number | null;
+                            quietTo: number | null;
+                        };
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    put_api_v1_organizations__orgId__notifications_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    saleAlerts: boolean;
+                    shiftAlerts: boolean;
+                    stockAlerts: boolean;
+                    reportEmail: boolean;
+                    quietFrom: number | null;
+                    quietTo: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            saleAlerts: boolean;
+                            shiftAlerts: boolean;
+                            stockAlerts: boolean;
+                            reportEmail: boolean;
+                            quietFrom: number | null;
+                            quietTo: number | null;
+                        };
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    post_api_v1_organizations__orgId__notifications_devices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "expo";
+                    token: string;
+                    platform?: string;
+                } | {
+                    /** @enum {string} */
+                    kind: "web";
+                    /** Format: uri */
+                    endpoint: string;
+                    p256dh: string;
+                    auth: string;
+                    platform?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    delete_api_v1_organizations__orgId__notifications_devices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    endpoint: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        ok: boolean;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
