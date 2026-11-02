@@ -1,6 +1,6 @@
 {
   "name": "@okpaid-io/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed TypeScript client for the OKPaid POS API (https://api.okpaid.io). Generated from the published OpenAPI 3.0.0 spec.",
   "license": "MIT",
   "publishConfig": {
