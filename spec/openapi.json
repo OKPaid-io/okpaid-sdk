@@ -2,7 +2,7 @@
   "info": {
     "title": "OKPaid API",
     "version": "1.0.0",
-    "description": "POS backend for OKPaid. Auth via session cookie (Better Auth) or x-api-key header. All routes documented via openApi() middleware."
+    "description": "Kiosk backend for OKPaid. Auth via session cookie (Better Auth) or x-api-key header. All routes documented via openApi() middleware."
   },
   "openapi": "3.0.0",
   "paths": {
@@ -948,6 +948,9 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
+                        "taxRate": {
+                          "type": "string"
+                        },
                         "reportEnabled": {
                           "type": "boolean"
                         },
@@ -1079,6 +1082,7 @@
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
+                        "taxRate",
                         "reportEnabled",
                         "reportHour",
                         "billingBankAccounts",
@@ -1294,6 +1298,9 @@
                   "returnRequiresApproval": {
                     "type": ["boolean", "null"]
                   },
+                  "taxRate": {
+                    "type": ["string", "null"]
+                  },
                   "reportEnabled": {
                     "type": ["boolean", "null"]
                   },
@@ -1467,6 +1474,9 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
+                        "taxRate": {
+                          "type": "string"
+                        },
                         "reportEnabled": {
                           "type": "boolean"
                         },
@@ -1598,6 +1608,7 @@
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
+                        "taxRate",
                         "reportEnabled",
                         "reportHour",
                         "billingBankAccounts",
@@ -1818,6 +1829,9 @@
                         "returnRequiresApproval": {
                           "type": "boolean"
                         },
+                        "taxRate": {
+                          "type": "string"
+                        },
                         "reportEnabled": {
                           "type": "boolean"
                         },
@@ -1949,6 +1963,7 @@
                         "apiKeysEnabled",
                         "returnWindowDays",
                         "returnRequiresApproval",
+                        "taxRate",
                         "reportEnabled",
                         "reportHour",
                         "billingBankAccounts",
@@ -5281,8 +5296,78 @@
       },
       "get": {
         "tags": ["Sales"],
-        "summary": "List sales (latest 100)",
+        "summary": "List sales (paged, filterable) with org-wide receipt totals",
         "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "completed", "pending_refund", "refunded"]
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "default": "createdAt",
+              "type": "string",
+              "enum": ["createdAt", "updatedAt", "receiptNumber", "paymentStatus"]
+            }
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": ["asc", "desc"]
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          },
           {
             "in": "path",
             "name": "orgId",
@@ -5345,6 +5430,15 @@
                           },
                           "updatedAt": {
                             "type": "string"
+                          },
+                          "itemCount": {
+                            "type": "number"
+                          },
+                          "itemNames": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
                           }
                         },
                         "required": [
@@ -5360,13 +5454,65 @@
                           "cashReceived",
                           "customerName",
                           "createdAt",
-                          "updatedAt"
+                          "updatedAt",
+                          "itemCount",
+                          "itemNames"
                         ],
                         "additionalProperties": false
                       }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "totalOrders": {
+                          "type": "number"
+                        },
+                        "completedOrders": {
+                          "type": "number"
+                        },
+                        "completedRevenue": {
+                          "type": "string"
+                        },
+                        "pendingOrders": {
+                          "type": "number"
+                        },
+                        "pendingAmount": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "totalOrders",
+                        "completedOrders",
+                        "completedRevenue",
+                        "pendingOrders",
+                        "pendingAmount"
+                      ],
+                      "additionalProperties": false
                     }
                   },
-                  "required": ["sales"],
+                  "required": ["sales", "total", "summary"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
                   "additionalProperties": false
                 }
               }
@@ -5805,6 +5951,280 @@
           }
         },
         "operationId": "get_api_v1_organizations__orgId__sales_reports_export"
+      }
+    },
+    "/api/v1/organizations/{orgId}/sales/reports/profit-loss": {
+      "get": {
+        "tags": ["Sales"],
+        "summary": "Profit and loss for a date range, with the previous equal-length period alongside",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "orgId",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200 OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "report": {
+                      "type": "object",
+                      "properties": {
+                        "period": {
+                          "type": "object",
+                          "properties": {
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["from", "to"],
+                          "additionalProperties": false
+                        },
+                        "previousPeriod": {
+                          "type": "object",
+                          "properties": {
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["from", "to"],
+                          "additionalProperties": false
+                        },
+                        "current": {
+                          "type": "object",
+                          "properties": {
+                            "grossSales": {
+                              "type": "string"
+                            },
+                            "discounts": {
+                              "type": "string"
+                            },
+                            "returns": {
+                              "type": "string"
+                            },
+                            "netSales": {
+                              "type": "string"
+                            },
+                            "completedSales": {
+                              "type": "string"
+                            },
+                            "taxCollected": {
+                              "type": "string"
+                            },
+                            "transactions": {
+                              "type": "number"
+                            },
+                            "completedTransactions": {
+                              "type": "number"
+                            },
+                            "refundedTransactions": {
+                              "type": "number"
+                            },
+                            "itemsSold": {
+                              "type": "number"
+                            },
+                            "tenders": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "paymentMethod": {
+                                    "type": "string"
+                                  },
+                                  "grossSales": {
+                                    "type": "string"
+                                  },
+                                  "taxCollected": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["paymentMethod", "grossSales", "taxCollected"],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "grossSales",
+                            "discounts",
+                            "returns",
+                            "netSales",
+                            "completedSales",
+                            "taxCollected",
+                            "transactions",
+                            "completedTransactions",
+                            "refundedTransactions",
+                            "itemsSold",
+                            "tenders"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "previous": {
+                          "type": "object",
+                          "properties": {
+                            "grossSales": {
+                              "type": "string"
+                            },
+                            "discounts": {
+                              "type": "string"
+                            },
+                            "returns": {
+                              "type": "string"
+                            },
+                            "netSales": {
+                              "type": "string"
+                            },
+                            "completedSales": {
+                              "type": "string"
+                            },
+                            "taxCollected": {
+                              "type": "string"
+                            },
+                            "transactions": {
+                              "type": "number"
+                            },
+                            "completedTransactions": {
+                              "type": "number"
+                            },
+                            "refundedTransactions": {
+                              "type": "number"
+                            },
+                            "itemsSold": {
+                              "type": "number"
+                            },
+                            "tenders": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "paymentMethod": {
+                                    "type": "string"
+                                  },
+                                  "grossSales": {
+                                    "type": "string"
+                                  },
+                                  "taxCollected": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["paymentMethod", "grossSales", "taxCollected"],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "grossSales",
+                            "discounts",
+                            "returns",
+                            "netSales",
+                            "completedSales",
+                            "taxCollected",
+                            "transactions",
+                            "completedTransactions",
+                            "refundedTransactions",
+                            "itemsSold",
+                            "tenders"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": ["period", "previousPeriod", "current", "previous"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": ["report"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "400 Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [false]
+                    },
+                    "error": {}
+                  },
+                  "required": ["success", "error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "401 Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "403 Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["error"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_api_v1_organizations__orgId__sales_reports_profit_loss"
       }
     },
     "/api/v1/organizations/{orgId}/sales/{saleId}": {
@@ -13471,6 +13891,9 @@
                           "nextDueDate": {
                             "type": "string"
                           },
+                          "anchorDay": {
+                            "type": ["number", "null"]
+                          },
                           "endDate": {
                             "type": ["string", "null"]
                           },
@@ -13496,6 +13919,7 @@
                           "description",
                           "frequency",
                           "nextDueDate",
+                          "anchorDay",
                           "endDate",
                           "isActive",
                           "createdById",
@@ -13760,6 +14184,9 @@
                         "nextDueDate": {
                           "type": "string"
                         },
+                        "anchorDay": {
+                          "type": ["number", "null"]
+                        },
                         "endDate": {
                           "type": ["string", "null"]
                         },
@@ -13785,6 +14212,7 @@
                         "description",
                         "frequency",
                         "nextDueDate",
+                        "anchorDay",
                         "endDate",
                         "isActive",
                         "createdById",
@@ -15374,7 +15802,8 @@
                               "image",
                               "return",
                               "staff_pin",
-                              "stock_receipt"
+                              "stock_receipt",
+                              "role"
                             ]
                           },
                           "resourceId": {
@@ -15578,7 +16007,8 @@
                               "image",
                               "return",
                               "staff_pin",
-                              "stock_receipt"
+                              "stock_receipt",
+                              "role"
                             ]
                           },
                           "resourceId": {
@@ -15795,7 +16225,8 @@
                               "image",
                               "return",
                               "staff_pin",
-                              "stock_receipt"
+                              "stock_receipt",
+                              "role"
                             ]
                           },
                           "resourceId": {
