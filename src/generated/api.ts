@@ -325,7 +325,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List sales (latest 100) */
+        /** List sales (paged, filterable) with org-wide receipt totals */
         get: operations["get_api_v1_organizations__orgId__sales"];
         put?: never;
         /** Create a sale (stock decremented, invoice counted) */
@@ -362,6 +362,23 @@ export interface paths {
         };
         /** Export sales report as CSV (text/csv response) */
         get: operations["get_api_v1_organizations__orgId__sales_reports_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{orgId}/sales/reports/profit-loss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Profit and loss for a date range, with the previous equal-length period alongside */
+        get: operations["get_api_v1_organizations__orgId__sales_reports_profit_loss"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2231,6 +2248,7 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            taxRate: string;
                             reportEnabled: boolean;
                             reportHour: number | null;
                             billingBankAccounts: {
@@ -2320,6 +2338,7 @@ export interface operations {
                     billingSupportEmail?: ("" | string) | null;
                     returnWindowDays?: number | null;
                     returnRequiresApproval?: boolean | null;
+                    taxRate?: string | null;
                     reportEnabled?: boolean | null;
                     reportHour?: number | null;
                     currency?: string | null;
@@ -2375,6 +2394,7 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            taxRate: string;
                             reportEnabled: boolean;
                             reportHour: number | null;
                             billingBankAccounts: {
@@ -2501,6 +2521,7 @@ export interface operations {
                             apiKeysEnabled: boolean;
                             returnWindowDays: number;
                             returnRequiresApproval: boolean;
+                            taxRate: string;
                             reportEnabled: boolean;
                             reportHour: number | null;
                             billingBankAccounts: {
@@ -3922,7 +3943,16 @@ export interface operations {
     };
     get_api_v1_organizations__orgId__sales: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                offset?: number;
+                q?: string;
+                status?: "pending" | "completed" | "pending_refund" | "refunded";
+                sort?: "createdAt" | "updatedAt" | "receiptNumber" | "paymentStatus";
+                direction?: "asc" | "desc";
+                from?: string;
+                to?: string;
+            };
             header?: never;
             path: {
                 orgId: string;
@@ -3953,7 +3983,30 @@ export interface operations {
                             customerName: string | null;
                             createdAt: string;
                             updatedAt: string;
+                            itemCount: number;
+                            itemNames: string[];
                         }[];
+                        total: number;
+                        summary: {
+                            totalOrders: number;
+                            completedOrders: number;
+                            completedRevenue: string;
+                            pendingOrders: number;
+                            pendingAmount: string;
+                        };
+                    };
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
                     };
                 };
             };
@@ -4224,6 +4277,111 @@ export interface operations {
                 };
                 content: {
                     "text/csv": string;
+                };
+            };
+            /** @description 400 Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: false;
+                        error: unknown;
+                    };
+                };
+            };
+            /** @description 401 Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+            /** @description 403 Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    get_api_v1_organizations__orgId__sales_reports_profit_loss: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 200 OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        report: {
+                            period: {
+                                from: string;
+                                to: string;
+                            };
+                            previousPeriod: {
+                                from: string;
+                                to: string;
+                            };
+                            current: {
+                                grossSales: string;
+                                discounts: string;
+                                returns: string;
+                                netSales: string;
+                                completedSales: string;
+                                taxCollected: string;
+                                transactions: number;
+                                completedTransactions: number;
+                                refundedTransactions: number;
+                                itemsSold: number;
+                                tenders: {
+                                    paymentMethod: string;
+                                    grossSales: string;
+                                    taxCollected: string;
+                                }[];
+                            };
+                            previous: {
+                                grossSales: string;
+                                discounts: string;
+                                returns: string;
+                                netSales: string;
+                                completedSales: string;
+                                taxCollected: string;
+                                transactions: number;
+                                completedTransactions: number;
+                                refundedTransactions: number;
+                                itemsSold: number;
+                                tenders: {
+                                    paymentMethod: string;
+                                    grossSales: string;
+                                    taxCollected: string;
+                                }[];
+                            };
+                        };
+                    };
                 };
             };
             /** @description 400 Bad Request */
@@ -7855,6 +8013,7 @@ export interface operations {
                             description: string | null;
                             frequency: string;
                             nextDueDate: string;
+                            anchorDay: number | null;
                             endDate: string | null;
                             isActive: boolean;
                             createdById: string | null;
@@ -8004,6 +8163,7 @@ export interface operations {
                             description: string | null;
                             frequency: string;
                             nextDueDate: string;
+                            anchorDay: number | null;
                             endDate: string | null;
                             isActive: boolean;
                             createdById: string | null;
@@ -8863,7 +9023,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt" | "role";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
@@ -8955,7 +9115,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt" | "role";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
@@ -9044,7 +9204,7 @@ export interface operations {
                             /** @enum {string} */
                             action: "create" | "update" | "delete";
                             /** @enum {string} */
-                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt";
+                            resource: "product" | "promotion" | "sale" | "customer" | "supplier" | "organization" | "member" | "api_key" | "kiosk_session" | "kiosk_display" | "held_sale" | "kiosk_settings" | "kiosk_banner" | "image" | "return" | "staff_pin" | "stock_receipt" | "role";
                             resourceId?: string;
                             resourceName?: string;
                             oldValues?: {
